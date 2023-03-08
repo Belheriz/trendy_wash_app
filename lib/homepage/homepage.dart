@@ -17,8 +17,27 @@ import 'package:trendy_mobile_1/homepage/sidemenu/stamp/stamp.dart';
 import '../locationService/location_service.dart';
 import 'wash/washModel.dart';
 
+final HttpLink httpLink = HttpLink(
+  'https://api.graphql.trendywash.net/',
+);
+
+final AuthLink authLink = AuthLink(
+  getToken: () async =>
+      'Bearer <eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY0MDZkMjM0ZTM5MTJmZTgwZDEyODQ3MCIsImlhdCI6MTY3ODIxODk5OSwiZXhwIjoxNjc4MzA1Mzk5fQ.NF9ovfe--0-DlTTkGW4mFORI1YTDSDWOK7cXDLzZSWo>',
+);
+
+final Link link = authLink.concat(httpLink);
+
 class homepage extends StatelessWidget {
-  const homepage({super.key});
+  homepage({super.key});
+
+  ValueNotifier<GraphQLClient> client = ValueNotifier(
+    GraphQLClient(
+      link: link,
+      cache: GraphQLCache(),
+    ),
+  );
+
   static const MaterialColor white = MaterialColor(
     whitePrimaryValue,
     <int, Color>{
@@ -38,13 +57,18 @@ class homepage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'Flutter Demo',
-      theme: ThemeData(
-        primarySwatch: white,
-        fontFamily: 'LineseedsanRg',
+    WidgetsFlutterBinding.ensureInitialized();
+
+    return GraphQLProvider(
+      child: MaterialApp(
+        title: 'Flutter Demo',
+        theme: ThemeData(
+          primarySwatch: white,
+          fontFamily: 'LineseedsanRg',
+        ),
+        home: const MyHomePage(),
       ),
-      home: const MyHomePage(),
+      client: client,
     );
   }
 }

@@ -6,7 +6,7 @@ import 'package:trendy_mobile_1/homepage/login/loginpage.dart';
 import 'package:trendy_mobile_1/homepage/register/register.dart';
 import 'package:trendy_mobile_1/homepage/size_helper.dart';
 
-final HttpLink httpLink = HttpLink(
+/*final HttpLink httpLink = HttpLink(
   'https://api.graphql.trendywash.net/',
 );
 final AuthLink authLink = AuthLink(
@@ -21,20 +21,19 @@ ValueNotifier<GraphQLClient> client = ValueNotifier(
     link: link,
     cache: GraphQLCache(),
   ),
-);
+);*/
 void main() async {
   runApp(
-    GraphQLProvider(
-        client: client,
-        child: MaterialApp(
-          home: const MyApp(),
-        )),
+    MaterialApp(
+      home: MyApp(),
+    ),
   );
-  await initHiveForFlutter();
 }
 
 class MyApp extends StatelessWidget {
-  const MyApp({Key? key}) : super(key: key);
+  const MyApp({
+    Key? key,
+  }) : super(key: key);
 
   static const MaterialColor white = MaterialColor(
     whitePrimaryValue,
