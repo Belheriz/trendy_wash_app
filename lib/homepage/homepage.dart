@@ -24,6 +24,8 @@ final HttpLink httpLink = HttpLink(
 final AuthLink authLink = AuthLink(
   getToken: () async =>
       'Bearer <eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY0MDZkMjM0ZTM5MTJmZTgwZDEyODQ3MCIsImlhdCI6MTY3ODIxODk5OSwiZXhwIjoxNjc4MzA1Mzk5fQ.NF9ovfe--0-DlTTkGW4mFORI1YTDSDWOK7cXDLzZSWo>',
+  headerKey:
+      'Bearer <eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY0MDZkMjM0ZTM5MTJmZTgwZDEyODQ3MCIsImlhdCI6MTY3ODIxODk5OSwiZXhwIjoxNjc4MzA1Mzk5fQ.NF9ovfe--0-DlTTkGW4mFORI1YTDSDWOK7cXDLzZSWo>',
 );
 
 final Link link = authLink.concat(httpLink);
@@ -83,6 +85,8 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> {
+  List<washmodel>? _laundry;
+  GraphQLService _graphQLService = GraphQLService();
   String? lat1, lon1;
   String readRepositories = """
   query getSite(\$siteId: ID!){
@@ -101,6 +105,7 @@ class _MyHomePageState extends State<MyHomePage> {
   void initState() {
     super.initState();
     getLocation();
+    _load();
   }
 
   void getLocation() async {
@@ -113,6 +118,12 @@ class _MyHomePageState extends State<MyHomePage> {
         lon1 = locationData.longitude!.toStringAsFixed(2);
       }
     }
+  }
+
+  void _load() async {
+    _laundry = null;
+    _laundry = await _graphQLService.getLaundry();
+    setState(() {});
   }
 
   @override
@@ -214,7 +225,108 @@ class _MyHomePageState extends State<MyHomePage> {
                 ],
               ),
             ),
-            Query(
+            _laundry == null
+                ? const Center(
+                    child: CircularProgressIndicator(),
+                  )
+                : _laundry!.isEmpty
+                    ? const Center(
+                        child: Text('No data'),
+                      )
+                    : SingleChildScrollView(
+                        child: ListView.builder(
+                          scrollDirection: Axis.vertical,
+                          shrinkWrap: true,
+                          itemCount: _laundry!.length,
+                          itemBuilder: (BuildContext context, int index) {
+                            return ListTile(
+                              trailing: Icon(Icons.star),
+                              leading: Image.asset(
+                                _laundry![index].images,
+                              ),
+                              title: Text(
+                                _laundry![index].washname,
+                                style: TextStyle(
+                                  fontWeight: FontWeight.bold,
+                                  fontSize: 18,
+                                ),
+                              ),
+                              onTap: () {},
+                              subtitle: Column(
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceBetween,
+                                children: [
+                                  Row(
+                                    children: [
+                                      Text(''),
+                                      SizedBox(
+                                        width: 20,
+                                      ),
+                                      Image.asset('assets/images/Location.png'),
+                                      Text('')
+                                    ],
+                                  ),
+                                  Row(
+                                    children: [
+                                      Container(
+                                        width: 100,
+                                        height: 30,
+                                        decoration: BoxDecoration(
+                                          color: Color(0xff093B9D),
+                                          borderRadius:
+                                              BorderRadius.circular(18),
+                                        ),
+                                        child: Align(
+                                          alignment: Alignment(0, -0.5),
+                                          child: Text(
+                                            _laundry![index].washer,
+                                            textAlign: TextAlign.center,
+                                            style: TextStyle(
+                                              color: Colors.white,
+                                              fontWeight: FontWeight.bold,
+                                            ),
+                                          ),
+                                        ),
+                                      ),
+                                      Container(
+                                        width: 100,
+                                        height: 30,
+                                        decoration: BoxDecoration(
+                                          color: Color(0xff00BBA9),
+                                          borderRadius:
+                                              BorderRadius.circular(18),
+                                        ),
+                                        child: Align(
+                                          alignment: Alignment(0, -0.5),
+                                          child: Text(
+                                            _laundry![index].dryer,
+                                            textAlign: TextAlign.center,
+                                            style: TextStyle(
+                                              color: Colors.white,
+                                              fontWeight: FontWeight.bold,
+                                            ),
+                                          ),
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                  Align(
+                                    alignment: Alignment(-0.9, 0),
+                                    child: Text(
+                                      'ว่าง 3 เครื่อง',
+                                      style: TextStyle(
+                                        color: Colors.red,
+                                        fontWeight: FontWeight.bold,
+                                      ),
+                                    ),
+                                  )
+                                ],
+                              ),
+                            );
+                          },
+                        ),
+                      )
+            /*Query(
                 options: QueryOptions(
                   document: gql(readRepositories),
                   pollInterval: const Duration(seconds: 10),
@@ -328,7 +440,7 @@ class _MyHomePageState extends State<MyHomePage> {
                       },
                     ),
                   );
-                }),
+                }),*/
           ],
         ),
       ),
