@@ -11,20 +11,24 @@ class GraphQLService {
       QueryResult result = await client.query(
         QueryOptions(
           fetchPolicy: FetchPolicy.networkOnly,
-          document: gql("""
-     query{
-  getSites{
-    latitude
-    longitude
-    site_washer_count
-    site_dryer_count
-    site_name
-    img_site
-    
-  }
-}
+          document: gql(
+            """
+     query getSite(\$siteId: ID!){
+      getSite(siteId: \$siteId){
+        latitude
+        longitude
+        site_washer_count
+        site_dryer_count
+        site_name
+        img_site
+      }
+    }
 
-"""),
+""",
+          ),
+          variables: {
+            'siteId': '636caba997b41d387c6a2abf',
+          },
         ),
       );
       if (result.hasException) {
