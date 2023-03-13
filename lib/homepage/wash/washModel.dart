@@ -2,11 +2,11 @@ class washmodel {
   final String washname;
   final String dryer;
   final String washer;
-  final double lat;
+  final String lat;
   final String images;
   //final String location;
   //final String kilo;
-  final double lon;
+  final String lon;
 
   washmodel({
     required this.washname,

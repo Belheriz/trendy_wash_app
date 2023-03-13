@@ -5,6 +5,7 @@ import 'package:page_transition/page_transition.dart';
 import 'package:trendy_mobile_1/homepage/login/loginpage.dart';
 import 'package:trendy_mobile_1/homepage/register/register.dart';
 import 'package:trendy_mobile_1/homepage/size_helper.dart';
+import 'dart:io';
 
 /*final HttpLink httpLink = HttpLink(
   'https://api.graphql.trendywash.net/',
@@ -22,7 +23,18 @@ ValueNotifier<GraphQLClient> client = ValueNotifier(
     cache: GraphQLCache(),
   ),
 );*/
+class MyHttpOverrides extends HttpOverrides {
+  @override
+  HttpClient createHttpClient(SecurityContext? context) {
+    HttpClient client = super.createHttpClient(context);
+    client.badCertificateCallback =
+        (X509Certificate cert, String host, int port) => true;
+    return client;
+  }
+}
+
 void main() async {
+  HttpOverrides.global = new MyHttpOverrides();
   runApp(
     MaterialApp(
       home: MyApp(),
