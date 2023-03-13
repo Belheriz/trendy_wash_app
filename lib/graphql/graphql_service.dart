@@ -1,3 +1,5 @@
+import 'dart:math';
+
 import 'package:graphql_flutter/graphql_flutter.dart';
 import 'package:trendy_mobile_1/graphql/graphql_config.dart';
 import 'package:trendy_mobile_1/homepage/wash/washModel.dart';
@@ -31,21 +33,24 @@ class GraphQLService {
           },
         ),
       );
+
       if (result.hasException) {
         throw Exception(result.exception);
       }
 
-      List? res = result.data?['getSite'];
+      Map<String, dynamic>? res = result.data?['getSite'];
 
       if (res == null) {
         return [];
       }
 
-      List<washmodel> laundrys =
-          res.map((laundry) => washmodel.fromMap(map: laundry)).toList();
+      List<washmodel> laundrys = res.entries
+          .map((laundry) => washmodel.fromMap(map: laundry.value))
+          .toList();
 
       return laundrys;
     } catch (error) {
+      print(e);
       throw Exception(error);
     }
   }
