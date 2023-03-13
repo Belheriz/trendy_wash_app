@@ -43,7 +43,8 @@ class GraphQLService {
 
       List<washmodel> laundrys =
           res.map((laundry) => washmodel.fromMap(map: laundry)).toList();
-      return [];
+
+      return laundrys;
     } catch (error) {
       throw Exception(error);
     }
