@@ -355,11 +355,14 @@ class _MyHomePageState extends State<MyHomePage> {
                       final laundry = repositories[index];
                       return ListTile(
                         trailing: Icon(Icons.star),
-                        leading: Image.asset(
-                          laundry['img_site'] ?? '',
+                        leading: Image.network(
+                          laundry?['img_site'] ?? '',
+                          errorBuilder: ((context, error, stackTrace) {
+                            return Text('Error Loading Image');
+                          }),
                         ),
                         title: Text(
-                          laundry['site_name'] ?? '',
+                          laundry?['site_name'] ?? '',
                           style: TextStyle(
                             fontWeight: FontWeight.bold,
                             fontSize: 18,
@@ -391,7 +394,7 @@ class _MyHomePageState extends State<MyHomePage> {
                                   child: Align(
                                     alignment: Alignment(0, -0.5),
                                     child: Text(
-                                      laundry['site_washer_count'] ?? '',
+                                      laundry?['site_washer_count'] ?? '',
                                       textAlign: TextAlign.center,
                                       style: TextStyle(
                                         color: Colors.white,
@@ -410,7 +413,7 @@ class _MyHomePageState extends State<MyHomePage> {
                                   child: Align(
                                     alignment: Alignment(0, -0.5),
                                     child: Text(
-                                      laundry['site_dryer_count'] ?? '',
+                                      laundry?['site_dryer_count'] ?? '',
                                       textAlign: TextAlign.center,
                                       style: TextStyle(
                                         color: Colors.white,
