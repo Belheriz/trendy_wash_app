@@ -7,7 +7,7 @@ import 'package:trendy_mobile_1/homepage/register/register.dart';
 import 'package:trendy_mobile_1/homepage/size_helper.dart';
 import 'dart:io';
 
-/*final HttpLink httpLink = HttpLink(
+final HttpLink httpLink = HttpLink(
   'https://api.graphql.trendywash.net/',
 );
 final AuthLink authLink = AuthLink(
@@ -22,7 +22,8 @@ ValueNotifier<GraphQLClient> client = ValueNotifier(
     link: link,
     cache: GraphQLCache(),
   ),
-);*/
+);
+
 class MyHttpOverrides extends HttpOverrides {
   @override
   HttpClient createHttpClient(SecurityContext? context) {
@@ -36,8 +37,11 @@ class MyHttpOverrides extends HttpOverrides {
 void main() async {
   HttpOverrides.global = new MyHttpOverrides();
   runApp(
-    MaterialApp(
-      home: MyApp(),
+    GraphQLProvider(
+      client: client,
+      child: MaterialApp(
+        home: MyApp(),
+      ),
     ),
   );
 }
