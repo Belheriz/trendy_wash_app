@@ -8,7 +8,7 @@ class GraphQLService {
   static GraphQLConfig graphQLConfig = GraphQLConfig();
   GraphQLClient client = graphQLConfig.clientToQuery();
 
-  Future<List<washmodel>> getLaundry() async {
+  Future<List<washmodel>> getLaundry({required String Id}) async {
     try {
       QueryResult result = await client.query(
         QueryOptions(
@@ -29,7 +29,7 @@ class GraphQLService {
 """,
           ),
           variables: {
-            'siteId': '636caba997b41d387c6a2abf',
+            'siteId': Id,
           },
         ),
       );
@@ -67,3 +67,5 @@ class GraphQLService {
     
   }
 }*/
+
+//'636caba997b41d387c6a2abf'

@@ -74,7 +74,7 @@ class _MyHomePageState extends State<Washmainpage> {
 
   void _load() async {
     _laundry = null;
-    _laundry = await _graphQLService.getLaundry();
+    _laundry = await _graphQLService.getLaundry(Id: '636caba997b41d387c6a2abf');
     setState(() {});
   }
 

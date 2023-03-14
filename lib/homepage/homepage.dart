@@ -61,16 +61,13 @@ class homepage extends StatelessWidget {
   Widget build(BuildContext context) {
     WidgetsFlutterBinding.ensureInitialized();
 
-    return GraphQLProvider(
-      child: MaterialApp(
-        title: 'Flutter Demo',
-        theme: ThemeData(
-          primarySwatch: white,
-          fontFamily: 'LineseedsanRg',
-        ),
-        home: const MyHomePage(),
+    return MaterialApp(
+      title: 'Flutter Demo',
+      theme: ThemeData(
+        primarySwatch: white,
+        fontFamily: 'LineseedsanRg',
       ),
-      client: client,
+      home: const MyHomePage(),
     );
   }
 }
@@ -105,7 +102,7 @@ class _MyHomePageState extends State<MyHomePage> {
   void initState() {
     super.initState();
     getLocation();
-    _load();
+    // _load();
   }
 
   void getLocation() async {
@@ -122,7 +119,7 @@ class _MyHomePageState extends State<MyHomePage> {
 
   void _load() async {
     _laundry = null;
-    _laundry = await _graphQLService.getLaundry();
+    _laundry = await _graphQLService.getLaundry(Id: '636caba997b41d387c6a2abf');
     setState(() {});
   }
 
@@ -225,7 +222,7 @@ class _MyHomePageState extends State<MyHomePage> {
                 ],
               ),
             ),
-            _laundry == null
+            /* _laundry == null
                 ? const Center(
                     child: CircularProgressIndicator(),
                   )
@@ -325,122 +322,123 @@ class _MyHomePageState extends State<MyHomePage> {
                             );
                           },
                         ),
-                      )
-            /*Query(
-                options: QueryOptions(
-                  document: gql(readRepositories),
-                  pollInterval: const Duration(seconds: 10),
-                  variables: {
-                    'siteId': '636caba997b41d387c6a2abf',
-                  },
-                ),
-                builder: (QueryResult result,
-                    {VoidCallback? refetch, FetchMore? fetchMore}) {
-                  if (result.hasException) {
-                    return Text(result.exception.toString());
-                  }
+                      )*/
+            Query(
+              options: QueryOptions(
+                document: gql(readRepositories),
+                pollInterval: const Duration(seconds: 10),
+                variables: {
+                  'siteId': '636caba997b41d387c6a2abf',
+                },
+              ),
+              builder: (QueryResult result,
+                  {VoidCallback? refetch, FetchMore? fetchMore}) {
+                if (result.hasException) {
+                  return Text(result.exception.toString());
+                }
 
-                  if (result.isLoading) {
-                    return const Text('Loading');
-                  }
+                if (result.isLoading) {
+                  return const Text('Loading');
+                }
 
-                  List? repositories = result.data?['getSite'];
+                Map<String, dynamic>? repositories = result.data?['getSite'];
 
-                  if (repositories == null) {
-                    return const Text('No repositories');
-                  }
-                  return SingleChildScrollView(
-                    child: ListView.builder(
-                      scrollDirection: Axis.vertical,
-                      shrinkWrap: true,
-                      itemCount: repositories.length,
-                      itemBuilder: (BuildContext context, int index) {
-                        final laundry = repositories[index];
-                        return ListTile(
-                          trailing: Icon(Icons.star),
-                          leading: Image.asset(
-                            laundry['img_site'] ?? '',
+                if (repositories == null) {
+                  return const Text('No repositories');
+                }
+                return SingleChildScrollView(
+                  child: ListView.builder(
+                    scrollDirection: Axis.vertical,
+                    shrinkWrap: true,
+                    itemCount: repositories.length,
+                    itemBuilder: (BuildContext context, int index) {
+                      final laundry = repositories[index];
+                      return ListTile(
+                        trailing: Icon(Icons.star),
+                        leading: Image.asset(
+                          laundry['img_site'] ?? '',
+                        ),
+                        title: Text(
+                          laundry['site_name'] ?? '',
+                          style: TextStyle(
+                            fontWeight: FontWeight.bold,
+                            fontSize: 18,
                           ),
-                          title: Text(
-                            laundry['site_name'] ?? '',
-                            style: TextStyle(
-                              fontWeight: FontWeight.bold,
-                              fontSize: 18,
+                        ),
+                        onTap: () {},
+                        subtitle: Column(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Row(
+                              children: [
+                                Text(''),
+                                SizedBox(
+                                  width: 20,
+                                ),
+                                Image.asset('assets/images/Location.png'),
+                                Text('')
+                              ],
                             ),
-                          ),
-                          onTap: () {},
-                          subtitle: Column(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            children: [
-                              Row(
-                                children: [
-                                  Text(''),
-                                  SizedBox(
-                                    width: 20,
+                            Row(
+                              children: [
+                                Container(
+                                  width: 100,
+                                  height: 30,
+                                  decoration: BoxDecoration(
+                                    color: Color(0xff093B9D),
+                                    borderRadius: BorderRadius.circular(18),
                                   ),
-                                  Image.asset('assets/images/Location.png'),
-                                  Text('')
-                                ],
-                              ),
-                              Row(
-                                children: [
-                                  Container(
-                                    width: 100,
-                                    height: 30,
-                                    decoration: BoxDecoration(
-                                      color: Color(0xff093B9D),
-                                      borderRadius: BorderRadius.circular(18),
-                                    ),
-                                    child: Align(
-                                      alignment: Alignment(0, -0.5),
-                                      child: Text(
-                                        laundry['site_washer_count'] ?? '',
-                                        textAlign: TextAlign.center,
-                                        style: TextStyle(
-                                          color: Colors.white,
-                                          fontWeight: FontWeight.bold,
-                                        ),
+                                  child: Align(
+                                    alignment: Alignment(0, -0.5),
+                                    child: Text(
+                                      laundry['site_washer_count'] ?? '',
+                                      textAlign: TextAlign.center,
+                                      style: TextStyle(
+                                        color: Colors.white,
+                                        fontWeight: FontWeight.bold,
                                       ),
                                     ),
-                                  ),
-                                  Container(
-                                    width: 100,
-                                    height: 30,
-                                    decoration: BoxDecoration(
-                                      color: Color(0xff00BBA9),
-                                      borderRadius: BorderRadius.circular(18),
-                                    ),
-                                    child: Align(
-                                      alignment: Alignment(0, -0.5),
-                                      child: Text(
-                                        laundry['site_dryer_count'] ?? '',
-                                        textAlign: TextAlign.center,
-                                        style: TextStyle(
-                                          color: Colors.white,
-                                          fontWeight: FontWeight.bold,
-                                        ),
-                                      ),
-                                    ),
-                                  ),
-                                ],
-                              ),
-                              Align(
-                                alignment: Alignment(-0.9, 0),
-                                child: Text(
-                                  'ว่าง 3 เครื่อง',
-                                  style: TextStyle(
-                                    color: Colors.red,
-                                    fontWeight: FontWeight.bold,
                                   ),
                                 ),
-                              )
-                            ],
-                          ),
-                        );
-                      },
-                    ),
-                  );
-                }),*/
+                                Container(
+                                  width: 100,
+                                  height: 30,
+                                  decoration: BoxDecoration(
+                                    color: Color(0xff00BBA9),
+                                    borderRadius: BorderRadius.circular(18),
+                                  ),
+                                  child: Align(
+                                    alignment: Alignment(0, -0.5),
+                                    child: Text(
+                                      laundry['site_dryer_count'] ?? '',
+                                      textAlign: TextAlign.center,
+                                      style: TextStyle(
+                                        color: Colors.white,
+                                        fontWeight: FontWeight.bold,
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                              ],
+                            ),
+                            Align(
+                              alignment: Alignment(-0.9, 0),
+                              child: Text(
+                                'ว่าง 3 เครื่อง',
+                                style: TextStyle(
+                                  color: Colors.red,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                            )
+                          ],
+                        ),
+                      );
+                    },
+                  ),
+                );
+              },
+            ),
           ],
         ),
       ),
