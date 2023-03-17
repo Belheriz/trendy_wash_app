@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:graphql_flutter/graphql_flutter.dart';
 
 import 'package:page_transition/page_transition.dart';
 import 'package:trendy_mobile_1/homepage/homepage.dart';
@@ -9,8 +10,8 @@ import 'package:trendy_mobile_1/homepage/register/register2.dart';
 import 'package:trendy_mobile_1/homepage/size_helper.dart';
 
 class registerpage extends StatelessWidget {
-  const registerpage({super.key});
-
+  const registerpage({super.key, required this.graphQLClient});
+  final ValueNotifier<GraphQLClient> graphQLClient;
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
@@ -19,21 +20,26 @@ class registerpage extends StatelessWidget {
         primarySwatch: Colors.blue,
         fontFamily: 'LineseedsanRg',
       ),
-      home: const MyHomePage(title: 'Flutter Demo Home Page'),
+      home: regisPage(
+        title: 'Flutter Demo Home Page',
+        client: graphQLClient,
+      ),
     );
   }
 }
 
-class MyHomePage extends StatefulWidget {
-  const MyHomePage({super.key, required this.title});
-
+class regisPage extends StatefulWidget {
+  const regisPage({super.key, required this.title, required this.client});
+  final ValueNotifier<GraphQLClient> client;
   final String title;
 
   @override
-  State<MyHomePage> createState() => _MyHomePageState();
+  State<regisPage> createState() => _regisPageState(passClient: client);
 }
 
-class _MyHomePageState extends State<MyHomePage> {
+class _regisPageState extends State<regisPage> {
+  _regisPageState({required this.passClient});
+  final ValueNotifier<GraphQLClient> passClient;
   TextFormField _textphone = new TextFormField(
     validator: (value) {
       if (value == null || value.isEmpty) {
@@ -122,7 +128,9 @@ class _MyHomePageState extends State<MyHomePage> {
               Navigator.push(
                   context,
                   PageTransition(
-                      child: loginpage(),
+                      child: loginpage(
+                        graphQLClient: passClient,
+                      ),
                       type: PageTransitionType.rightToLeft));
             },
             style: ElevatedButton.styleFrom(
@@ -167,7 +175,9 @@ class _MyHomePageState extends State<MyHomePage> {
                     Navigator.push(
                         context,
                         PageTransition(
-                            child: registerpage2(),
+                            child: registerpage2(
+                              graphQLClient: passClient,
+                            ),
                             type: PageTransitionType.rightToLeft));
                   }),
                   child: Text(

@@ -8,7 +8,7 @@ import 'package:trendy_mobile_1/locationService/location_service.dart';
 import 'washModel.dart';
 
 class wash extends StatelessWidget {
-  const wash({super.key});
+  const wash({super.key, required this.graphQLClient});
   static const MaterialColor white = MaterialColor(
     whitePrimaryValue,
     <int, Color>{
@@ -25,6 +25,7 @@ class wash extends StatelessWidget {
     },
   );
   static const int whitePrimaryValue = 0xFFFFFFFF;
+  final ValueNotifier<GraphQLClient> graphQLClient;
 
   @override
   Widget build(BuildContext context) {
@@ -34,21 +35,24 @@ class wash extends StatelessWidget {
         primarySwatch: white,
         fontFamily: 'LineseedsanRg',
       ),
-      home: const Washmainpage(),
+      home: Washmainpage(
+        client: graphQLClient,
+      ),
     );
   }
 }
 
 class Washmainpage extends StatefulWidget {
-  const Washmainpage({
-    super.key,
-  });
-
+  const Washmainpage({super.key, required this.client});
+  final ValueNotifier<GraphQLClient> client;
   @override
-  State<Washmainpage> createState() => _MyHomePageState();
+  State<Washmainpage> createState() => _WashMainPageState(passClient: client);
 }
 
-class _MyHomePageState extends State<Washmainpage> {
+class _WashMainPageState extends State<Washmainpage> {
+  _WashMainPageState({required this.passClient});
+
+  final ValueNotifier<GraphQLClient> passClient;
   bool typing = false;
   List<washmodel>? _laundry;
   GraphQLService _graphQLService = GraphQLService();
@@ -186,6 +190,7 @@ class _MyHomePageState extends State<Washmainpage> {
                             screen: washlaundry(
                               siteIdData: laundry?['siteId'] ?? '',
                               siteNameData: laundry?['site_name'] ?? "",
+                              graphQLClient: passClient,
                             ),
                             withNavBar: false,
                           );

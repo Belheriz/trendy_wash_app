@@ -1,6 +1,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
+import 'package:graphql_flutter/graphql_flutter.dart';
 import 'package:persistent_bottom_nav_bar_v2/persistent-tab-view.dart';
 import 'package:trendy_mobile_1/homepage/homepage.dart';
 import 'package:trendy_mobile_1/homepage/map/map.dart';
@@ -11,13 +12,16 @@ import 'package:trendy_mobile_1/homepage/wash/wash.dart';
 PersistentTabController _controller = PersistentTabController(initialIndex: 0);
 
 class bottomNavbar extends StatelessWidget {
-  const bottomNavbar({Key? key}) : super(key: key);
+  const bottomNavbar({Key? key, required this.graphQLClient}) : super(key: key);
+  final ValueNotifier<GraphQLClient> graphQLClient;
 
   List<Widget> _buildScreens() {
     return [
       homepage(),
       topUp(),
-      wash(),
+      wash(
+        graphQLClient: graphQLClient,
+      ),
       promotionpage(),
       map(),
     ];
