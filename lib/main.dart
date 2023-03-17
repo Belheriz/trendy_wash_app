@@ -211,7 +211,9 @@ class MyApp extends StatelessWidget {
                             Navigator.push(
                               context,
                               PageTransition(
-                                child: registerpage(),
+                                child: registerpage(
+                                  graphQLClient: client,
+                                ),
                                 type: PageTransitionType.rightToLeft,
                               ),
                             );
@@ -289,7 +291,9 @@ class MyApp extends StatelessWidget {
                                 Navigator.push(
                                     context,
                                     PageTransition(
-                                        child: loginpage(),
+                                        child: loginpage(
+                                          graphQLClient: client,
+                                        ),
                                         type: PageTransitionType.rightToLeft));
                               },
                               style: ElevatedButton.styleFrom(

@@ -9,7 +9,10 @@ import 'dryermodel.dart';
 
 class washlaundry extends StatelessWidget {
   const washlaundry(
-      {super.key, required this.siteIdData, required this.siteNameData});
+      {super.key,
+      required this.siteIdData,
+      required this.siteNameData,
+      required this.graphQLClient});
   static const MaterialColor white = MaterialColor(
     whitePrimaryValue,
     <int, Color>{
@@ -29,6 +32,7 @@ class washlaundry extends StatelessWidget {
 
   final String siteNameData;
   final String siteIdData;
+  final ValueNotifier<GraphQLClient> graphQLClient;
 
   @override
   Widget build(BuildContext context) {
@@ -41,31 +45,76 @@ class washlaundry extends StatelessWidget {
       home: _washlaundry(
         siteId: siteIdData,
         siteName: siteNameData,
+        client: graphQLClient,
       ),
     );
   }
 }
 
+/*Future<void> _startDeviceMutation({
+    required String deviceName,
+    required String customerName,
+    required String customerId,
+    required String actionPrice,
+    required String actionVia,
+  }) async {
+    final result = await passClient.value.mutate(
+      MutationOptions(
+        document: gql('''
+          mutation StartDevice(\$deviceName: String!, \$customerName: String!, \$customerId: String!, \$actionPrice: String!, \$actionVia: String!, \$promotionId: String, \$mode: [String]!, \$option: String!) {
+            startDevice(
+              deviceName: \$deviceName
+              customer_name: \$customerName
+              customer_id: \$customerId
+              action_price: \$actionPrice
+              action_via: \$actionVia
+              promotionId: \$promotionId
+              mode: \$mode
+              option: \$option
+            )
+          }
+        '''),
+        variables: {
+          'deviceName': deviceName,
+          'customerName': customerName,
+          'customerId': customerId,
+          'actionPrice': actionPrice,
+          'actionVia': actionVia,
+          'promotionId': '',
+          'mode': ['1'],
+          'option': '',
+        },
+      ),
+    );*/
 class _washlaundry extends StatefulWidget {
-  const _washlaundry({
-    super.key,
-    required this.siteId,
-    required this.siteName,
-  });
+  const _washlaundry(
+      {super.key,
+      required this.siteId,
+      required this.siteName,
+      required this.client});
   final String siteName;
   final String siteId;
+  final ValueNotifier<GraphQLClient> client;
   @override
   State<_washlaundry> createState() => _washlaundryPageState(
         useSiteid: siteId,
         useSitename: siteName,
+        passClient: client,
       );
 }
 
 class _washlaundryPageState extends State<_washlaundry> {
-  _washlaundryPageState({required this.useSiteid, required this.useSitename});
+  _washlaundryPageState({
+    required this.useSiteid,
+    required this.useSitename,
+    required this.passClient,
+  });
 
   final String useSiteid;
   final String useSitename;
+  final ValueNotifier<GraphQLClient> passClient;
+
+  bool _isLoading = false;
 
   String readRepositories = """
 query getMachineBySite( \$siteId: ID! ){
@@ -80,6 +129,146 @@ query getMachineBySite( \$siteId: ID! ){
     }
 
 """;
+
+  void _startDevice(BuildContext context) async {
+    setState(() {
+      _isLoading = true;
+    });
+
+    final QueryResult result = await GraphQLProvider.of(context).value.mutate(
+          MutationOptions(
+            document: gql(startDeviceMutation),
+            variables: {
+              'deviceName': '94B555223780',
+              'customer_name': 'Prik',
+              'customer_id': '1',
+              'action_price': '40',
+              'action_via': 'mobile',
+              'promotionId': '',
+              'mode': ['1'],
+              'option': '',
+            },
+          ),
+        );
+
+    setState(() {
+      _isLoading = false;
+    });
+
+    if (result.hasException) {
+      showDialog(
+        context: context,
+        builder: (_) => AlertDialog(
+          title: const Text('Error'),
+          content: Text(result.exception.toString()),
+          actions: [
+            ElevatedButton(
+              onPressed: () => Navigator.pop(context),
+              child: const Text('OK'),
+            ),
+          ],
+        ),
+      );
+    } else {
+      showDialog(
+        context: context,
+        builder: (BuildContext context) {
+          return AlertDialog(
+              insetPadding: EdgeInsets.zero,
+              content: Column(
+                children: [
+                  Image.asset('assets/images/laundrycomplete.png'),
+                  SizedBox(
+                    height: 20,
+                  ),
+                  Center(
+                    child: Text(
+                      'คำสั่งซักผ้าสำเร็จ',
+                      style: TextStyle(
+                          color: Colors.black,
+                          fontSize: 20,
+                          fontWeight: FontWeight.bold),
+                    ),
+                  ),
+                  SizedBox(
+                    height: 60,
+                  ),
+                  Container(
+                    height: 40,
+                    width: 180,
+                    child: ElevatedButton(
+                      child: Text(
+                        'ดูการเติมเงิน',
+                        style: TextStyle(
+                          color: Colors.white,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                      onPressed: () {},
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Color(0xff093B9E),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.all(
+                            Radius.circular(14),
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
+                  SizedBox(
+                    height: 15,
+                  ),
+                  Container(
+                    height: 40,
+                    width: 180,
+                    child: ElevatedButton(
+                      child: Text(
+                        'กลับหน้าหลัก',
+                        style: TextStyle(
+                            color: Color(0xff00BBA9),
+                            fontWeight: FontWeight.bold),
+                      ),
+                      onPressed: () {},
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Color(0xffD9F5F2),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.all(
+                            Radius.circular(14),
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
+                ],
+              ));
+        },
+      );
+    }
+  }
+
+  String startDeviceMutation = '''
+  mutation StartDevice(
+    \$deviceName: String!
+    \$customer_name: String!
+    \$customer_id: String!
+    \$action_price: String!
+    \$action_via: String!
+    \$promotionId: String!
+    \$mode: [String!]!
+    \$option: String!
+  ) {
+    startDevice(
+      deviceName: \$deviceName
+      customer_name: \$customer_name
+      customer_id: \$customer_id
+      action_price: \$action_price
+      action_via: \$action_via
+      promotionId: \$promotionId
+      mode: \$mode
+      option: \$option
+    )
+  }
+''';
 
   bool ischeck = false;
   bool ischeck2 = false;
@@ -126,50 +315,6 @@ query getMachineBySite( \$siteId: ID! ){
     washpromotion(images: 'assets/images/washpromotion2.png'),
   ];
 
-  List<washermodel> washer = [
-    washermodel(
-      washername: 'เครื่องซักผ้า NO.1 ',
-      images: 'assets/images/washer1.png',
-      price: 'เริ่มต้น 30 บาท',
-      kilo: 'เครื่องซัก 8 kg.',
-    ),
-    washermodel(
-      washername: 'เครื่องซักผ้า NO.2 ',
-      images: 'assets/images/washer2.png',
-      price: 'เริ่มต้น 40 บาท',
-      kilo: 'เครื่องซัก 10 kg.',
-    ),
-    washermodel(
-      washername: 'เครื่องซักผ้า NO.3 ',
-      images: 'assets/images/washer2.png',
-      price: 'เริ่มต้น 40 บาท',
-      kilo: 'เครื่องซัก 10 kg.',
-    ),
-    washermodel(
-      washername: 'เครื่องซักผ้า NO.4',
-      images: 'assets/images/washer3.png',
-      price: 'เริ่มต้น 60 บาท',
-      kilo: 'เครื่องซัก 18 kg.',
-    ),
-  ];
-
-  List<dryermodel> dryer = [
-    dryermodel(
-        dryername: 'เครื่องอบผ้า NO.1 ',
-        images: 'assets/images/dryer1.png',
-        price: 'เริ่มต้น 30 บาท',
-        kilo: 'เครื่องซัก 8 kg.'),
-    dryermodel(
-        dryername: 'เครื่องอบผ้า NO.2 ',
-        images: 'assets/images/dryer2.png',
-        price: 'เริ่มต้น 40 บาท',
-        kilo: 'เครื่องซัก 10 kg.'),
-    dryermodel(
-        dryername: 'เครื่องอบผ้า NO.3',
-        images: 'assets/images/dryer2.png',
-        price: 'เริ่มต้น 50 บาท',
-        kilo: 'เครื่องซัก 15 kg.'),
-  ];
 //"siteId": "63be59e2cbda00cdb4b56f62"
 
   @override
@@ -887,106 +1032,9 @@ query getMachineBySite( \$siteId: ID! ){
                                                   height: 50,
                                                   width: 180,
                                                   child: ElevatedButton(
-                                                    onPressed: () async {
+                                                    onPressed: () {
                                                       Navigator.pop;
-                                                      showDialog(
-                                                        context: context,
-                                                        builder: (BuildContext
-                                                            context) {
-                                                          return AlertDialog(
-                                                              insetPadding:
-                                                                  EdgeInsets
-                                                                      .zero,
-                                                              content: Column(
-                                                                children: [
-                                                                  Image.asset(
-                                                                      'assets/images/laundrycomplete.png'),
-                                                                  SizedBox(
-                                                                    height: 20,
-                                                                  ),
-                                                                  Center(
-                                                                    child: Text(
-                                                                      'คำสั่งซักผ้าสำเร็จ',
-                                                                      style: TextStyle(
-                                                                          color: Colors
-                                                                              .black,
-                                                                          fontSize:
-                                                                              20,
-                                                                          fontWeight:
-                                                                              FontWeight.bold),
-                                                                    ),
-                                                                  ),
-                                                                  SizedBox(
-                                                                    height: 60,
-                                                                  ),
-                                                                  Container(
-                                                                    height: 40,
-                                                                    width: 180,
-                                                                    child:
-                                                                        ElevatedButton(
-                                                                      child:
-                                                                          Text(
-                                                                        'ดูการเติมเงิน',
-                                                                        style:
-                                                                            TextStyle(
-                                                                          color:
-                                                                              Colors.white,
-                                                                          fontWeight:
-                                                                              FontWeight.bold,
-                                                                        ),
-                                                                      ),
-                                                                      onPressed:
-                                                                          () {},
-                                                                      style: ElevatedButton
-                                                                          .styleFrom(
-                                                                        backgroundColor:
-                                                                            Color(0xff093B9E),
-                                                                        shape:
-                                                                            RoundedRectangleBorder(
-                                                                          borderRadius:
-                                                                              BorderRadius.all(
-                                                                            Radius.circular(14),
-                                                                          ),
-                                                                        ),
-                                                                      ),
-                                                                    ),
-                                                                  ),
-                                                                  SizedBox(
-                                                                    height: 15,
-                                                                  ),
-                                                                  Container(
-                                                                    height: 40,
-                                                                    width: 180,
-                                                                    child:
-                                                                        ElevatedButton(
-                                                                      child:
-                                                                          Text(
-                                                                        'กลับหน้าหลัก',
-                                                                        style: TextStyle(
-                                                                            color:
-                                                                                Color(0xff00BBA9),
-                                                                            fontWeight: FontWeight.bold),
-                                                                      ),
-                                                                      onPressed:
-                                                                          () {},
-                                                                      style: ElevatedButton
-                                                                          .styleFrom(
-                                                                        backgroundColor:
-                                                                            Color(0xffD9F5F2),
-                                                                        shape:
-                                                                            RoundedRectangleBorder(
-                                                                          borderRadius:
-                                                                              BorderRadius.all(
-                                                                            Radius.circular(14),
-                                                                          ),
-                                                                        ),
-                                                                      ),
-                                                                    ),
-                                                                  ),
-                                                                ],
-                                                              ));
-                                                        },
-                                                      );
+                                                      _startDevice(context);
                                                     },
                                                     child: Text(
                                                       'เริ่มซักผ้า',
