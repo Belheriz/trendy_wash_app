@@ -3,7 +3,7 @@ import 'package:location/location.dart';
 
 class LocationService {
   late Location _location;
-  bool _serviceEnable = false;
+  bool _serviceEnable = true;
   PermissionStatus? _grantPermission;
 
   LocationService() {
