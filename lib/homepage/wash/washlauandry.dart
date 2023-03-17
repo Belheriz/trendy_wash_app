@@ -7,7 +7,8 @@ import 'package:trendy_mobile_1/homepage/wash/washpromotion.dart';
 import 'dryermodel.dart';
 
 class washlaundry extends StatelessWidget {
-  const washlaundry({super.key});
+  const washlaundry(
+      {super.key, required this.siteIdData, required this.siteNameData});
   static const MaterialColor white = MaterialColor(
     whitePrimaryValue,
     <int, Color>{
@@ -25,6 +26,9 @@ class washlaundry extends StatelessWidget {
   );
   static const int whitePrimaryValue = 0xFFFFFFFF;
 
+  final String siteNameData;
+  final String siteIdData;
+
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
@@ -33,7 +37,10 @@ class washlaundry extends StatelessWidget {
         primarySwatch: white,
         fontFamily: 'LineseedsanRg',
       ),
-      home: const _washlaundry(),
+      home: _washlaundry(
+        siteId: siteIdData,
+        siteName: siteNameData,
+      ),
     );
   }
 }
@@ -41,13 +48,24 @@ class washlaundry extends StatelessWidget {
 class _washlaundry extends StatefulWidget {
   const _washlaundry({
     super.key,
+    required this.siteId,
+    required this.siteName,
   });
-
+  final String siteName;
+  final String siteId;
   @override
-  State<_washlaundry> createState() => _MyHomePageState();
+  State<_washlaundry> createState() => _washlaundryPageState(
+        useSiteid: siteId,
+        useSitename: siteName,
+      );
 }
 
-class _MyHomePageState extends State<_washlaundry> {
+class _washlaundryPageState extends State<_washlaundry> {
+  _washlaundryPageState({required this.useSiteid, required this.useSitename});
+
+  final String useSiteid;
+  final String useSitename;
+
   bool ischeck = false;
   bool ischeck2 = false;
   bool ischeck3 = false;
@@ -136,6 +154,7 @@ class _MyHomePageState extends State<_washlaundry> {
         price: 'เริ่มต้น 50 บาท',
         kilo: 'เครื่องซัก 15 kg.'),
   ];
+//"siteId": "63be59e2cbda00cdb4b56f62"
 
   @override
   Widget build(BuildContext context) {
@@ -149,7 +168,8 @@ class _MyHomePageState extends State<_washlaundry> {
                 onPressed: () {},
               ),
               title: Text(
-                'Trendy Wash AT Taksin ',
+                useSitename,
+                //'Trendy Wash AT Taksin ',
                 style: TextStyle(
                   fontWeight: FontWeight.bold,
                 ),

@@ -17,28 +17,8 @@ import 'package:trendy_mobile_1/homepage/sidemenu/stamp/stamp.dart';
 import '../locationService/location_service.dart';
 import 'wash/washModel.dart';
 
-final HttpLink httpLink = HttpLink(
-  'https://api.graphql.trendywash.net/',
-);
-
-final AuthLink authLink = AuthLink(
-  getToken: () async =>
-      'Bearer <eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY0MDZkMjM0ZTM5MTJmZTgwZDEyODQ3MCIsImlhdCI6MTY3ODIxODk5OSwiZXhwIjoxNjc4MzA1Mzk5fQ.NF9ovfe--0-DlTTkGW4mFORI1YTDSDWOK7cXDLzZSWo>',
-  headerKey:
-      'Bearer <eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY0MDZkMjM0ZTM5MTJmZTgwZDEyODQ3MCIsImlhdCI6MTY3ODIxODk5OSwiZXhwIjoxNjc4MzA1Mzk5fQ.NF9ovfe--0-DlTTkGW4mFORI1YTDSDWOK7cXDLzZSWo>',
-);
-
-final Link link = authLink.concat(httpLink);
-
 class homepage extends StatelessWidget {
   homepage({super.key});
-
-  ValueNotifier<GraphQLClient> client = ValueNotifier(
-    GraphQLClient(
-      link: link,
-      cache: GraphQLCache(),
-    ),
-  );
 
   static const MaterialColor white = MaterialColor(
     whitePrimaryValue,
@@ -86,14 +66,14 @@ class _MyHomePageState extends State<MyHomePage> {
   GraphQLService _graphQLService = GraphQLService();
   String? lat1, lon1;
   String readRepositories = """
-  query getSite(\$siteId: ID!){
-      getSite(siteId: \$siteId){
-        latitude
-        longitude
+  query getSitesInfo( \$startLat: Float! \$startLon: Float! \$limit: Int!){
+      getSitesInfo(startLat: \$startLat startLon: \$startLon limit:\$limit){
+        distances
         site_washer_count
         site_dryer_count
         site_name
         img_site
+        siteId
       }
     }
 """;
@@ -111,8 +91,8 @@ class _MyHomePageState extends State<MyHomePage> {
 
     if (locationData != null) {
       setState() {
-        lat1 = locationData.latitude!.toStringAsFixed(2);
-        lon1 = locationData.longitude!.toStringAsFixed(2);
+        lat1 = locationData.latitude!.toStringAsFixed(6);
+        lon1 = locationData.longitude!.toStringAsFixed(6);
       }
     }
   }
@@ -197,7 +177,7 @@ class _MyHomePageState extends State<MyHomePage> {
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   Align(
-                    child: Text(
+                    child: const Text(
                       'Trendy Wash ใกล้บ้าน',
                       style: TextStyle(
                         color: Colors.black,
@@ -328,7 +308,9 @@ class _MyHomePageState extends State<MyHomePage> {
                 document: gql(readRepositories),
                 pollInterval: const Duration(seconds: 10),
                 variables: {
-                  'siteId': '636caba997b41d387c6a2abf',
+                  'startLat': 14.017384,
+                  'startLon': 100.672640,
+                  'limit': 10,
                 },
               ),
               builder: (QueryResult result,
@@ -341,7 +323,7 @@ class _MyHomePageState extends State<MyHomePage> {
                   return const Text('Loading');
                 }
 
-                Map<String, dynamic>? repositories = result.data?['getSite'];
+                List? repositories = result.data?['getSitesInfo'];
 
                 if (repositories == null) {
                   return const Text('No repositories');
@@ -355,11 +337,14 @@ class _MyHomePageState extends State<MyHomePage> {
                       final laundry = repositories[index];
                       return ListTile(
                         trailing: Icon(Icons.star),
-                        leading: Image.asset(
-                          laundry['img_site'] ?? '',
-                        ),
+                        /*leading: Image.network(
+                          laundry?['img_site'] ?? '',
+                          errorBuilder: ((context, error, stackTrace) {
+                            return Text('Error Loading Image');
+                          }),
+                        ),*/
                         title: Text(
-                          laundry['site_name'] ?? '',
+                          laundry?['site_name'] ?? '',
                           style: TextStyle(
                             fontWeight: FontWeight.bold,
                             fontSize: 18,
@@ -391,7 +376,7 @@ class _MyHomePageState extends State<MyHomePage> {
                                   child: Align(
                                     alignment: Alignment(0, -0.5),
                                     child: Text(
-                                      laundry['site_washer_count'] ?? '',
+                                      laundry?['site_washer_count'] ?? '',
                                       textAlign: TextAlign.center,
                                       style: TextStyle(
                                         color: Colors.white,
@@ -410,7 +395,7 @@ class _MyHomePageState extends State<MyHomePage> {
                                   child: Align(
                                     alignment: Alignment(0, -0.5),
                                     child: Text(
-                                      laundry['site_dryer_count'] ?? '',
+                                      laundry?['site_dryer_count'] ?? '',
                                       textAlign: TextAlign.center,
                                       style: TextStyle(
                                         color: Colors.white,
@@ -438,6 +423,14 @@ class _MyHomePageState extends State<MyHomePage> {
                   ),
                 );
               },
+            ),
+            Center(
+              child: Column(
+                children: [
+                  Text(lat1 ?? "no lat read"),
+                  Text(lon1 ?? "nol lon read")
+                ],
+              ),
             ),
           ],
         ),
