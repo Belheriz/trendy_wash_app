@@ -130,7 +130,7 @@ query getMachineBySite( \$siteId: ID! ){
 
 """;
 
-  void _startDevice(BuildContext context) async {
+  void _startDevice(BuildContext context, String deviceName) async {
     setState(() {
       _isLoading = true;
     });
@@ -139,7 +139,7 @@ query getMachineBySite( \$siteId: ID! ){
           MutationOptions(
             document: gql(startDeviceMutation),
             variables: {
-              'deviceName': '94B555223780',
+              'deviceName': deviceName,
               'customer_name': 'Prik',
               'customer_id': '1',
               'action_price': '40',
@@ -1034,7 +1034,10 @@ query getMachineBySite( \$siteId: ID! ){
                                                   child: ElevatedButton(
                                                     onPressed: () {
                                                       Navigator.pop;
-                                                      _startDevice(context);
+                                                      _startDevice(
+                                                          context,
+                                                          washer?['deviceName'] ??
+                                                              "");
                                                     },
                                                     child: Text(
                                                       'เริ่มซักผ้า',
