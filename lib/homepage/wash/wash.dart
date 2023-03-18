@@ -158,7 +158,12 @@ class _WashMainPageState extends State<Washmainpage> {
                     return const Text('Loading');
                   }
 
-                  List? repositories = result.data?['getSitesInfo'];
+                  List<Map<String, dynamic>>? repositories =
+                      (result.data?['getSitesInfo'] as List<dynamic>)
+                          .cast<Map<String, dynamic>>();
+
+                  repositories
+                      .sort((a, b) => a['distances'].compareTo(b['distances']));
 
                   if (repositories == null) {
                     return const Text('No repositories');
@@ -178,7 +183,7 @@ class _WashMainPageState extends State<Washmainpage> {
                           }),
                         ),*/
                         title: Text(
-                          laundry?['site_name'] ?? '',
+                          laundry['site_name'] ?? '',
                           style: TextStyle(
                             fontWeight: FontWeight.bold,
                             fontSize: 18,
@@ -188,8 +193,8 @@ class _WashMainPageState extends State<Washmainpage> {
                           pushNewScreen(
                             context,
                             screen: washlaundry(
-                              siteIdData: laundry?['siteId'] ?? '',
-                              siteNameData: laundry?['site_name'] ?? "",
+                              siteIdData: laundry['siteId'] ?? '',
+                              siteNameData: laundry['site_name'] ?? "",
                               graphQLClient: passClient,
                             ),
                             withNavBar: false,
@@ -206,7 +211,7 @@ class _WashMainPageState extends State<Washmainpage> {
                                 ),
                                 Image.asset('assets/images/Location.png'),
                                 Text(
-                                  laundry?['distances'] ?? '',
+                                  laundry['distances'] ?? '',
                                   style: TextStyle(
                                     color: Colors.grey,
                                     fontWeight: FontWeight.bold,
@@ -226,7 +231,7 @@ class _WashMainPageState extends State<Washmainpage> {
                                   child: Align(
                                     alignment: Alignment(0, -0.5),
                                     child: Text(
-                                      laundry?['site_washer_count'] ?? '',
+                                      laundry['site_washer_count'] ?? '',
                                       textAlign: TextAlign.center,
                                       style: TextStyle(
                                         color: Colors.white,
@@ -245,7 +250,7 @@ class _WashMainPageState extends State<Washmainpage> {
                                   child: Align(
                                     alignment: Alignment(0, -0.5),
                                     child: Text(
-                                      laundry?['site_dryer_count'] ?? '',
+                                      laundry['site_dryer_count'] ?? '',
                                       textAlign: TextAlign.center,
                                       style: TextStyle(
                                         color: Colors.white,

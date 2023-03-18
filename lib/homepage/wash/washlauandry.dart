@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:graphql_flutter/graphql_flutter.dart';
@@ -125,6 +127,9 @@ query getMachineBySite( \$siteId: ID! ){
         machine_model
         customer_name
         price_default
+        device_status
+        machine_time_count
+        time_default
       }
     }
 
@@ -315,6 +320,23 @@ query getMachineBySite( \$siteId: ID! ){
     washpromotion(images: 'assets/images/washpromotion2.png'),
   ];
 
+  double _progressValue = 0.0;
+  String formattedTime = '';
+
+  String deviceStatus = '';
+
+  void _startProgress() {
+    const duration = const Duration(milliseconds: 3600);
+    Timer.periodic(duration, (Timer timer) {
+      setState(() {
+        _progressValue += 0.01;
+        if (_progressValue >= 1.0) {
+          timer.cancel();
+        }
+      });
+    });
+  }
+
 //"siteId": "63be59e2cbda00cdb4b56f62"
 
   @override
@@ -385,7 +407,7 @@ query getMachineBySite( \$siteId: ID! ){
             options: QueryOptions(
               document: gql(readRepositories),
               pollInterval: const Duration(seconds: 10),
-              variables: {'siteId': "636caba997b41d387c6a2abf"},
+              variables: {'siteId': useSiteid},
             ),
             builder: (QueryResult result,
                 {VoidCallback? refetch, FetchMore? fetchMore}) {
@@ -402,11 +424,66 @@ query getMachineBySite( \$siteId: ID! ){
                   .where(
                       (machine) => machine['machine_group'] == 'เครื่องซักผ้า')
                   .toList();
-              List dryingMachines = machines!
+              List dryingMachines = machines
                   .where(
                       (machine) => machine['machine_group'] == 'เครื่องอบผ้า')
                   .toList();
 
+              washingMachines.sort((a, b) {
+                int aNum = int.parse(
+                    a["machine_name"].replaceAll(RegExp(r'[^\d]'), ''));
+                int bNum = int.parse(
+                    b["machine_name"].replaceAll(RegExp(r'[^\d]'), ''));
+                int numComparison = aNum.compareTo(bNum);
+                if (numComparison != 0) {
+                  return numComparison;
+                }
+                return a["machine_name"].compareTo(b["machine_name"]);
+              });
+              dryingMachines.sort((a, b) {
+                int aNum = int.parse(
+                    a["machine_name"].replaceAll(RegExp(r'[^\d]'), ''));
+                int bNum = int.parse(
+                    b["machine_name"].replaceAll(RegExp(r'[^\d]'), ''));
+                int numComparison = aNum.compareTo(bNum);
+                if (numComparison != 0) {
+                  return numComparison;
+                }
+                return a["machine_name"].compareTo(b["machine_name"]);
+              });
+
+              String keepSecond = machines
+                  .where((timedefault) => timedefault['time_default'])
+                  .toString();
+
+              int convertSecond = int.parse(keepSecond);
+              int second = convertSecond;
+              Duration duration = Duration(seconds: second);
+              formattedTime = duration.inHours.toString() + "นาที";
+
+              if (duration.inHours > 1) {
+                formattedTime += 'วินาที';
+              }
+
+              String devicesta = result.data?['device_status'] ?? '';
+
+              if (devicesta == '0') {
+                String statusOnline = 'เครื่องว่าง';
+
+                setState(() {
+                  deviceStatus = statusOnline;
+                });
+              } else if (devicesta == 1) {
+                String statusWorking = 'เครื่องทำงานอยู่';
+                setState(() {
+                  deviceStatus = statusWorking;
+                });
+              } else if (devicesta == -1) {
+                String statusOffline = 'ขาดการเชื่อมต่อ';
+                setState(() {
+                  deviceStatus = statusOffline;
+                });
+              }
               if (machines == null) {
                 return const Text('No repositories');
               }
@@ -1066,14 +1143,27 @@ query getMachineBySite( \$siteId: ID! ){
                                     ));
                           },
                           //leading: Image.asset(washerlist.images),
-                          title: Text(
-                            washer?['machine_name'] ?? '',
-                            style: TextStyle(
-                              color: Colors.black,
-                              fontWeight: FontWeight.bold,
-                              fontSize: 20,
-                            ),
+                          title: Row(
+                            children: [
+                              Text(
+                                washer?['machine_group'] ?? '',
+                                style: TextStyle(
+                                  color: Colors.black,
+                                  fontWeight: FontWeight.bold,
+                                  fontSize: 20,
+                                ),
+                              ),
+                              Text(
+                                washer?['machine_name'] ?? '',
+                                style: TextStyle(
+                                  color: Colors.black,
+                                  fontWeight: FontWeight.bold,
+                                  fontSize: 20,
+                                ),
+                              ),
+                            ],
                           ),
+
                           trailing: SvgPicture.asset(
                               'assets/svgassets/downcursor.svg'),
                           subtitle: Column(
@@ -1100,7 +1190,7 @@ query getMachineBySite( \$siteId: ID! ){
                               Row(
                                 children: [
                                   Text(
-                                    'พร้อมใช้งาน',
+                                    deviceStatus,
                                     style: TextStyle(
                                       color: Color(0xff00BBA9),
                                       fontWeight: FontWeight.bold,
@@ -1110,7 +1200,7 @@ query getMachineBySite( \$siteId: ID! ){
                                     width: 90,
                                   ),
                                   Text(
-                                    '1 ชั่วโมง',
+                                    formattedTime,
                                     style: TextStyle(
                                       color: Color(0xff00BBA9),
                                       fontWeight: FontWeight.bold,
@@ -1124,11 +1214,9 @@ query getMachineBySite( \$siteId: ID! ){
                               Container(
                                 height: 10,
                                 width: 250,
-                                decoration: BoxDecoration(
-                                  color: Color(0xffD9F5F2),
-                                  borderRadius: BorderRadius.all(
-                                    Radius.circular(18),
-                                  ),
+                                child: LinearProgressIndicator(
+                                  value: _progressValue,
+                                  backgroundColor: Color(0xffD9F5F2),
                                 ),
                               ),
                             ],
@@ -1173,14 +1261,34 @@ query getMachineBySite( \$siteId: ID! ){
                         final dryer = dryingMachines[index];
                         return ListTile(
                           //leading: Image.asset(dryerlist.images),
-                          title: Text(
+                          title: Row(
+                            children: [
+                              Text(
+                                dryer?['machine_group'] ?? '',
+                                style: TextStyle(
+                                  color: Colors.black,
+                                  fontWeight: FontWeight.bold,
+                                  fontSize: 20,
+                                ),
+                              ),
+                              Text(
+                                dryer?['machine_name'] ?? '',
+                                style: TextStyle(
+                                  color: Colors.black,
+                                  fontWeight: FontWeight.bold,
+                                  fontSize: 20,
+                                ),
+                              ),
+                            ],
+                          ),
+                          /*Text(
                             dryer?['machine_name'] ?? '',
                             style: TextStyle(
                               color: Colors.black,
                               fontWeight: FontWeight.bold,
                               fontSize: 20,
                             ),
-                          ),
+                          ),*/
                           trailing: SvgPicture.asset(
                               'assets/svgassets/downcursor.svg'),
                           subtitle: Column(
