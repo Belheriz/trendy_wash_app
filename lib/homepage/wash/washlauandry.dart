@@ -452,19 +452,14 @@ query getMachineBySite( \$siteId: ID! ){
                 return a["machine_name"].compareTo(b["machine_name"]);
               });
 
-              String keepSecond = machines
-                  .where((timedefault) => timedefault['time_default'])
-                  .toString();
-
-              int convertSecond = int.parse(keepSecond);
-              int second = convertSecond;
-              Duration duration = Duration(seconds: second);
-              formattedTime = duration.inHours.toString() + "นาที";
+              int seconds = result.data?['time_default'] ?? 0;
+              Duration duration = Duration(seconds: seconds);
+              String formattedTime = duration.inHours.toString() + ' hour';
 
               if (duration.inHours > 1) {
-                formattedTime += 'วินาที';
+                formattedTime += 's';
               }
-
+              print('seconds:$seconds');
               String devicesta = result.data?['device_status'] ?? '';
 
               if (devicesta == '0') {
@@ -1325,7 +1320,7 @@ query getMachineBySite( \$siteId: ID! ){
                                     width: 90,
                                   ),
                                   Text(
-                                    '1 ชั่วโมง',
+                                    dryer?['time_default'] ?? '',
                                     style: TextStyle(
                                       color: Color(0xff00BBA9),
                                       fontWeight: FontWeight.bold,
@@ -1350,7 +1345,8 @@ query getMachineBySite( \$siteId: ID! ){
                           ),
                         );
                       },
-                    )
+                    ),
+                    Text(useSiteid),
                   ],
                 ),
               );
