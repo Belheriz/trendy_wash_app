@@ -452,33 +452,6 @@ query getMachineBySite( \$siteId: ID! ){
                 return a["machine_name"].compareTo(b["machine_name"]);
               });
 
-              int seconds = result.data?['time_default'] ?? 0;
-              Duration duration = Duration(seconds: seconds);
-              String formattedTime = duration.inHours.toString() + ' hour';
-
-              if (duration.inHours > 1) {
-                formattedTime += 's';
-              }
-              print('seconds:$seconds');
-              String devicesta = result.data?['device_status'] ?? '';
-
-              if (devicesta == '0') {
-                String statusOnline = 'เครื่องว่าง';
-
-                setState(() {
-                  deviceStatus = statusOnline;
-                });
-              } else if (devicesta == 1) {
-                String statusWorking = 'เครื่องทำงานอยู่';
-                setState(() {
-                  deviceStatus = statusWorking;
-                });
-              } else if (devicesta == -1) {
-                String statusOffline = 'ขาดการเชื่อมต่อ';
-                setState(() {
-                  deviceStatus = statusOffline;
-                });
-              }
               if (machines == null) {
                 return const Text('No repositories');
               }
@@ -503,6 +476,27 @@ query getMachineBySite( \$siteId: ID! ){
                       itemCount: washingMachines.length,
                       itemBuilder: (BuildContext context, int index) {
                         final washer = washingMachines[index];
+                        String keeptime = washer?['time_default'] ?? '';
+                        int seconds = int.tryParse(keeptime) ?? 0;
+                        Duration duration = Duration(seconds: seconds);
+                        String formattedTime =
+                            duration.inHours.toString() + ' hour';
+
+                        if (duration.inHours > 1) {
+                          formattedTime += 's';
+                        }
+                        String devicesta = washer?['device_status'] ?? '';
+
+                        if (devicesta == '0') {
+                          String statusOnline = 'เครื่องว่าง';
+                          deviceStatus = statusOnline;
+                        } else if (devicesta == 1) {
+                          String statusWorking = 'เครื่องทำงานอยู่';
+                          deviceStatus = statusWorking;
+                        } else if (devicesta == -1) {
+                          String statusOffline = 'ขาดการเชื่อมต่อ';
+                          deviceStatus = statusOffline;
+                        }
                         return ListTile(
                           onTap: () {
                             showModalBottomSheet(
@@ -1196,6 +1190,7 @@ query getMachineBySite( \$siteId: ID! ){
                                   ),
                                   Text(
                                     formattedTime,
+                                    // washer?['time_default'] ?? '',
                                     style: TextStyle(
                                       color: Color(0xff00BBA9),
                                       fontWeight: FontWeight.bold,
