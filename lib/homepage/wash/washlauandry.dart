@@ -478,13 +478,19 @@ query getMachineBySite( \$siteId: ID! ){
                         final washer = washingMachines[index];
                         String keeptime = washer?['time_default'] ?? '';
                         int seconds = int.tryParse(keeptime) ?? 0;
-                        Duration duration = Duration(seconds: seconds);
-                        String formattedTime =
-                            duration.inHours.toString() + ' hour';
-
-                        if (duration.inHours > 1) {
+                        int minutes = seconds ~/ 60;
+                        String formattedTime = minutes.toString() + ' นาที';
+                        if (minutes > 1) {
                           formattedTime += 's';
                         }
+                        //Duration duration = Duration(seconds: seconds);
+                        /* String formattedTime =
+                            duration.inHours.toString() + ' hour';*/
+                        print(keeptime);
+                        print('seconds:$seconds');
+                        /*if (duration.inHours > 1) {
+                          formattedTime += 's';
+                        }*/
                         String devicesta = washer?['device_status'] ?? '';
 
                         if (devicesta == '0') {
@@ -1249,6 +1255,33 @@ query getMachineBySite( \$siteId: ID! ){
                       itemCount: dryingMachines.length,
                       itemBuilder: (BuildContext context, int index) {
                         final dryer = dryingMachines[index];
+                        String keeptime = dryer?['time_default'] ?? '';
+                        int seconds = int.tryParse(keeptime) ?? 0;
+                        int minutes = seconds ~/ 60;
+                        String formattedTime = minutes.toString() + ' นาที';
+                        if (minutes > 1) {
+                          formattedTime += 's';
+                        }
+                        //Duration duration = Duration(seconds: seconds);
+                        /* String formattedTime =
+                            duration.inHours.toString() + ' hour';*/
+                        print(keeptime);
+                        print('seconds:$seconds');
+                        /*if (duration.inHours > 1) {
+                          formattedTime += 's';
+                        }*/
+                        String devicesta = dryer?['device_status'] ?? '';
+
+                        if (devicesta == '0') {
+                          String statusOnline = 'เครื่องว่าง';
+                          deviceStatus = statusOnline;
+                        } else if (devicesta == 1) {
+                          String statusWorking = 'เครื่องทำงานอยู่';
+                          deviceStatus = statusWorking;
+                        } else if (devicesta == -1) {
+                          String statusOffline = 'ขาดการเชื่อมต่อ';
+                          deviceStatus = statusOffline;
+                        }
                         return ListTile(
                           //leading: Image.asset(dryerlist.images),
                           title: Row(
@@ -1305,7 +1338,7 @@ query getMachineBySite( \$siteId: ID! ){
                               Row(
                                 children: [
                                   Text(
-                                    'พร้อมใช้งาน',
+                                    deviceStatus,
                                     style: TextStyle(
                                       color: Color(0xff00BBA9),
                                       fontWeight: FontWeight.bold,
@@ -1315,7 +1348,7 @@ query getMachineBySite( \$siteId: ID! ){
                                     width: 90,
                                   ),
                                   Text(
-                                    dryer?['time_default'] ?? '',
+                                    formattedTime,
                                     style: TextStyle(
                                       color: Color(0xff00BBA9),
                                       fontWeight: FontWeight.bold,
