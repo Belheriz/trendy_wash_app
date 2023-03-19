@@ -203,16 +203,33 @@ class _regisPageState extends State<regisPage> {
                 width: w * 0.8,
                 height: h * 0.06,
                 child: ElevatedButton(
-                  onPressed: (() {
-                    Navigator.push(
-                        context,
-                        PageTransition(
-                            child: registerpage2(
-                              graphQLClient: passClient,
-                              verificationId: _verificationId,
-                            ),
-                            type: PageTransitionType.rightToLeft));
-                    requestVerifyCode();
+                  onPressed: (() async {
+                    await FirebaseAuth.instance.verifyPhoneNumber(
+                      phoneNumber: '+66${phoneController.text}',
+                      verificationCompleted:
+                          (PhoneAuthCredential credential) async {
+                        // Auto-retrieve the SMS code on Android devices.
+                        await FirebaseAuth.instance
+                            .signInWithCredential(credential);
+                      },
+                      verificationFailed: (FirebaseAuthException e) {
+                        if (e.code == 'invalid-phone-number') {
+                          print('The provided phone number is not valid.');
+                        }
+                      },
+                      codeSent: (String verificationId, int? resendToken) {
+                        // Navigate to the second page to input OTP code.
+                        Navigator.pushReplacement(
+                            context,
+                            PageTransition(
+                                child: registerpage2(
+                                  graphQLClient: passClient,
+                                  verificationId: verificationId,
+                                ),
+                                type: PageTransitionType.rightToLeft));
+                      },
+                      codeAutoRetrievalTimeout: (String verificationId) {},
+                    );
                   }),
                   child: Text(
                     'ถัดไป',

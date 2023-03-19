@@ -11,7 +11,7 @@ class registerpage2 extends StatelessWidget {
   const registerpage2(
       {super.key, required this.graphQLClient, required this.verificationId});
   final ValueNotifier<GraphQLClient> graphQLClient;
-  final String? verificationId;
+  final String verificationId;
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
@@ -35,7 +35,7 @@ class regis2Page extends StatefulWidget {
       required this.title,
       required this.client,
       required this.verification});
-  final String? verification;
+  final String verification;
   final ValueNotifier<GraphQLClient> client;
   final String title;
 
@@ -48,7 +48,7 @@ class regis2Page extends StatefulWidget {
 
 class _regis2PageState extends State<regis2Page> {
   _regis2PageState({required this.passClient, required this.passVerifacation});
-  final String? passVerifacation;
+  final String passVerifacation;
   final ValueNotifier<GraphQLClient> passClient;
   TextFormField _textpassword = new TextFormField(
     validator: (value) {
@@ -183,7 +183,7 @@ class _regis2PageState extends State<regis2Page> {
                 height: h * 0.06,
                 child: ElevatedButton(
                   onPressed: (() {
-                    Navigator.push(
+                    Navigator.pushReplacement(
                         context,
                         PageTransition(
                             child: registerpageotp(
