@@ -1,3 +1,4 @@
+import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:graphql_flutter/graphql_flutter.dart';
@@ -36,6 +37,8 @@ class MyHttpOverrides extends HttpOverrides {
 
 void main() async {
   HttpOverrides.global = new MyHttpOverrides();
+  WidgetsFlutterBinding.ensureInitialized();
+  await Firebase.initializeApp();
   runApp(
     GraphQLProvider(
       client: client,

@@ -1,0 +1,47 @@
+{
+  "project_info": {
+    "project_number": "831848602319",
+    "project_id": "trendywashapp",
+    "storage_bucket": "trendywashapp.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:831848602319:android:8044415357df8aa65bf5ba",
+        "android_client_info": {
+          "package_name": "com.example.trendy_mobile_1"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "831848602319-0fv2g6jrhiia1djfg2hv4siccg30scnt.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.trendy_mobile_1",
+            "certificate_hash": "156f592a0bd2a64a0b600428958ddd4f7812a561"
+          }
+        },
+        {
+          "client_id": "831848602319-d0t5lvdq8125l7i6lh8fohb36ao071o6.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDBnqbdEgzZKZm1tLGp4JnV-zfibUZ7sxo"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "831848602319-d0t5lvdq8125l7i6lh8fohb36ao071o6.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

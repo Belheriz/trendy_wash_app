@@ -1,3 +1,4 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:graphql_flutter/graphql_flutter.dart';
@@ -9,8 +10,10 @@ import 'package:trendy_mobile_1/homepage/login/loginpage.dart';
 import 'package:trendy_mobile_1/homepage/size_helper.dart';
 
 class registerpageotp extends StatelessWidget {
-  const registerpageotp({super.key, required this.graphQLClient});
+  const registerpageotp(
+      {super.key, required this.graphQLClient, required this.verificationId});
   final ValueNotifier<GraphQLClient> graphQLClient;
+  final String? verificationId;
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
@@ -22,24 +25,36 @@ class registerpageotp extends StatelessWidget {
       home: regisOtpPage(
         title: 'Flutter Demo Home Page',
         client: graphQLClient,
+        passVerification: verificationId,
       ),
     );
   }
 }
 
 class regisOtpPage extends StatefulWidget {
-  const regisOtpPage({super.key, required this.title, required this.client});
+  const regisOtpPage(
+      {super.key,
+      required this.title,
+      required this.client,
+      required this.passVerification});
   final ValueNotifier<GraphQLClient> client;
   final String title;
+  final String? passVerification;
 
   @override
-  State<regisOtpPage> createState() => _RegisOtpPageState(passClient: client);
+  State<regisOtpPage> createState() => _RegisOtpPageState(
+        passClient: client,
+        useVerificationId: passVerification,
+      );
 }
 
 class _RegisOtpPageState extends State<regisOtpPage> {
-  _RegisOtpPageState({required this.passClient});
-
+  FirebaseAuth _auth = FirebaseAuth.instance;
+  _RegisOtpPageState(
+      {required this.passClient, required this.useVerificationId});
+  final String? useVerificationId;
   final ValueNotifier<GraphQLClient> passClient;
+  TextEditingController smsController = TextEditingController();
   TextFormField _textpassword = new TextFormField(
     validator: (value) {
       if (value == null || value.isEmpty) {
@@ -54,7 +69,7 @@ class _RegisOtpPageState extends State<regisOtpPage> {
     autocorrect: false,
   );
 
-  Widget passwordinput() {
+  Widget otPinput() {
     double w = displayWidth(context);
     return Container(
       margin: EdgeInsets.only(left: w * 0.05, right: w * 0.05),
@@ -62,7 +77,20 @@ class _RegisOtpPageState extends State<regisOtpPage> {
           color: Color.fromARGB(255, 240, 240, 240),
           border: Border.all(width: 1.2, color: Colors.cyanAccent),
           borderRadius: BorderRadius.all(Radius.circular(18))),
-      child: _textpassword,
+      child: TextFormField(
+        controller: smsController,
+        validator: (value) {
+          if (value == null || value.isEmpty) {
+            return 'กรุณาตั้งรหัสผ่าน';
+          } else {
+            return null;
+          }
+        },
+        decoration: InputDecoration(
+            contentPadding: EdgeInsets.all(10), border: InputBorder.none),
+        keyboardType: TextInputType.numberWithOptions(),
+        autocorrect: false,
+      ),
     );
   }
 
@@ -192,7 +220,8 @@ class _RegisOtpPageState extends State<regisOtpPage> {
               SizedBox(
                 height: h * 0.1,
               ),
-              Row(
+              otPinput(),
+              /*Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   SizedBox(
@@ -268,7 +297,7 @@ class _RegisOtpPageState extends State<regisOtpPage> {
                     ),
                   ),
                 ],
-              ),
+              ),*/
               SizedBox(
                 height: h * 0.12,
               ),

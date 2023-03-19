@@ -8,8 +8,10 @@ import 'package:trendy_mobile_1/homepage/register/registerotp.dart';
 import 'package:trendy_mobile_1/homepage/size_helper.dart';
 
 class registerpage2 extends StatelessWidget {
-  const registerpage2({super.key, required this.graphQLClient});
+  const registerpage2(
+      {super.key, required this.graphQLClient, required this.verificationId});
   final ValueNotifier<GraphQLClient> graphQLClient;
+  final String? verificationId;
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
@@ -21,23 +23,32 @@ class registerpage2 extends StatelessWidget {
       home: regis2Page(
         title: 'Flutter Demo Home Page',
         client: graphQLClient,
+        verification: verificationId,
       ),
     );
   }
 }
 
 class regis2Page extends StatefulWidget {
-  const regis2Page({super.key, required this.title, required this.client});
-
+  const regis2Page(
+      {super.key,
+      required this.title,
+      required this.client,
+      required this.verification});
+  final String? verification;
   final ValueNotifier<GraphQLClient> client;
   final String title;
 
   @override
-  State<regis2Page> createState() => _regis2PageState(passClient: client);
+  State<regis2Page> createState() => _regis2PageState(
+        passClient: client,
+        passVerifacation: verification,
+      );
 }
 
 class _regis2PageState extends State<regis2Page> {
-  _regis2PageState({required this.passClient});
+  _regis2PageState({required this.passClient, required this.passVerifacation});
+  final String? passVerifacation;
   final ValueNotifier<GraphQLClient> passClient;
   TextFormField _textpassword = new TextFormField(
     validator: (value) {
@@ -177,6 +188,7 @@ class _regis2PageState extends State<regis2Page> {
                         PageTransition(
                             child: registerpageotp(
                               graphQLClient: passClient,
+                              verificationId: passVerifacation,
                             ),
                             type: PageTransitionType.rightToLeft));
                   }),

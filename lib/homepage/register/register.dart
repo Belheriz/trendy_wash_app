@@ -1,3 +1,4 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:graphql_flutter/graphql_flutter.dart';
 
@@ -38,21 +39,38 @@ class regisPage extends StatefulWidget {
 }
 
 class _regisPageState extends State<regisPage> {
+  FirebaseAuth _auth = FirebaseAuth.instance;
+  GlobalKey<ScaffoldState> scaffoldKey = GlobalKey();
+  //
+  TextEditingController phoneController = TextEditingController();
+  //
   _regisPageState({required this.passClient});
+  //
   final ValueNotifier<GraphQLClient> passClient;
-  TextFormField _textphone = new TextFormField(
-    validator: (value) {
-      if (value == null || value.isEmpty) {
-        return 'กรุณาใส่เบอร์โทรศัพท์ของท่าน';
-      } else {
-        return null;
-      }
-    },
-    decoration: InputDecoration(
-        contentPadding: EdgeInsets.all(10), border: InputBorder.none),
-    keyboardType: TextInputType.text,
-    autocorrect: false,
-  );
+  //
+  String? _verificationId;
+
+  requestVerifyCode() {
+    _auth.verifyPhoneNumber(
+        phoneNumber: "+66" + phoneController.text,
+        timeout: const Duration(seconds: 5),
+        verificationCompleted: (firebaseUser) {
+          //
+        },
+        verificationFailed: (error) {
+          print(
+              'Phone number verification failed. Code: ${error.code}. Message: ${error.message}');
+        },
+        codeSent: (verificationId, [forceResendingToken]) {
+          setState(() {
+            _verificationId = verificationId;
+          });
+          print(verificationId);
+        },
+        codeAutoRetrievalTimeout: (verificationId) {
+          //
+        });
+  }
 
   Widget phoneinput() {
     double w = displayWidth(context);
@@ -62,7 +80,20 @@ class _regisPageState extends State<regisPage> {
           color: Color.fromARGB(255, 240, 240, 240),
           border: Border.all(width: 1.2, color: Colors.cyanAccent),
           borderRadius: BorderRadius.all(Radius.circular(18))),
-      child: _textphone,
+      child: TextFormField(
+        controller: phoneController,
+        validator: (value) {
+          if (value == null || value.isEmpty) {
+            return 'กรุณาใส่เบอร์โทรศัพท์ของท่าน';
+          } else {
+            return null;
+          }
+        },
+        decoration: InputDecoration(
+            contentPadding: EdgeInsets.all(10), border: InputBorder.none),
+        keyboardType: TextInputType.text,
+        autocorrect: false,
+      ),
     );
   }
 
@@ -151,6 +182,7 @@ class _regisPageState extends State<regisPage> {
     double h = displayHeight(context);
     return SafeArea(
       child: Scaffold(
+        key: scaffoldKey,
         body: Center(
           child: Column(
             //mainAxisAlignment: MainAxisAlignment.center,
@@ -177,8 +209,10 @@ class _regisPageState extends State<regisPage> {
                         PageTransition(
                             child: registerpage2(
                               graphQLClient: passClient,
+                              verificationId: _verificationId,
                             ),
                             type: PageTransitionType.rightToLeft));
+                    requestVerifyCode();
                   }),
                   child: Text(
                     'ถัดไป',
