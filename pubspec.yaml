@@ -44,6 +44,8 @@ dependencies:
   geocoding: ^2.0.5
   gql_error_link: ^0.2.3+1
   http: ^0.13.5
+  firebase_core: ^2.8.0
+  firebase_auth: ^4.3.0
  
 
 dev_dependencies:
