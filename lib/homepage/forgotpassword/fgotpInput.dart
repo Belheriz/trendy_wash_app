@@ -2,14 +2,16 @@ import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:graphql_flutter/graphql_flutter.dart';
 import 'package:page_transition/page_transition.dart';
-import 'package:trendy_mobile_1/homepage/forgotpassword/FgnumberInput.dart';
+import 'package:trendy_mobile_1/homepage/forgotpassword/fgresetPassword.dart';
 import 'package:trendy_mobile_1/homepage/login/loginpage2.dart';
 import 'package:trendy_mobile_1/homepage/register/register.dart';
 import 'package:trendy_mobile_1/homepage/size_helper.dart';
 
-class loginpage extends StatelessWidget {
-  const loginpage({super.key, required this.graphQLClient});
-  final ValueNotifier<GraphQLClient> graphQLClient;
+class fgotpinput extends StatelessWidget {
+  const fgotpinput({
+    super.key,
+  });
+
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
@@ -19,24 +21,24 @@ class loginpage extends StatelessWidget {
       ),
       home: logPage(
         title: 'Flutter Demo Home Page',
-        client: graphQLClient,
       ),
     );
   }
 }
 
 class logPage extends StatefulWidget {
-  const logPage({super.key, required this.title, required this.client});
-  final ValueNotifier<GraphQLClient> client;
+  const logPage({
+    super.key,
+    required this.title,
+  });
+
   final String title;
 
   @override
-  State<logPage> createState() => _logPageState(passClient: client);
+  State<logPage> createState() => _logPageState();
 }
 
 class _logPageState extends State<logPage> {
-  _logPageState({required this.passClient});
-  final ValueNotifier<GraphQLClient> passClient;
   TextFormField _textphone = new TextFormField(
     validator: (value) {
       if (value == null || value.isEmpty) {
@@ -84,7 +86,7 @@ class _logPageState extends State<logPage> {
         children: [
           Center(
             child: Text(
-              'เข้าสู่ระบบ',
+              'รีเซ็ตรหัสผ่าน',
               style: TextStyle(
                   fontSize: 26,
                   fontWeight: FontWeight.bold,
@@ -96,7 +98,7 @@ class _logPageState extends State<logPage> {
           ),
           Container(
             child: Text(
-              'กรอกเบอร์โทรศัพท์ของท่าน',
+              'กรุณากรอก OTP ของท่าน',
               style: TextStyle(
                 fontSize: 18,
                 fontFamily: 'LineseedsanRg',
@@ -108,7 +110,7 @@ class _logPageState extends State<logPage> {
     );
   }
 
-  Widget textandbutton() {
+  /*Widget textandbutton() {
     double w = displayWidth(context);
     return Row(
       mainAxisAlignment: MainAxisAlignment.center,
@@ -138,9 +140,7 @@ class _logPageState extends State<logPage> {
               Navigator.push(
                   context,
                   PageTransition(
-                      child: registerpage(
-                        graphQLClient: passClient,
-                      ),
+                      child: registerpage(),
                       type: PageTransitionType.rightToLeft));
             },
             style: ElevatedButton.styleFrom(
@@ -153,53 +153,7 @@ class _logPageState extends State<logPage> {
         )
       ],
     );
-  }
-
-  Widget forgotandbutton() {
-    double w = displayWidth(context);
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.center,
-      children: [
-        Container(
-          child: Text(
-            'ลืมรหัสผ่าน?',
-            style: TextStyle(
-              fontFamily: 'LineseedsanRg',
-            ),
-          ),
-        ),
-        SizedBox(
-          width: w * 0.03,
-        ),
-        Container(
-          child: ElevatedButton(
-            child: Text(
-              'กดที่นี่เพื่อรีเซ็ตรหัสผ่าน',
-              style: TextStyle(
-                fontWeight: FontWeight.bold,
-                color: Colors.red,
-                fontFamily: 'LineseedsanBd',
-              ),
-            ),
-            onPressed: () {
-              Navigator.push(
-                  context,
-                  PageTransition(
-                      child: fgNumberinput(),
-                      type: PageTransitionType.rightToLeft));
-            },
-            style: ElevatedButton.styleFrom(
-              elevation: 0,
-              backgroundColor: Color.fromRGBO(217, 245, 242, 100),
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(20),
-              ),
-            ),
-          ),
-        )
-      ],
-    );
-  }
+  }*/
 
   @override
   Widget build(BuildContext context) {
@@ -221,7 +175,7 @@ class _logPageState extends State<logPage> {
               ),
               phoneinput(),
               SizedBox(
-                height: h * 0.1,
+                height: h * 0.12,
               ),
               Container(
                 width: w * 0.8,
@@ -231,9 +185,7 @@ class _logPageState extends State<logPage> {
                     Navigator.push(
                         context,
                         PageTransition(
-                            child: loginpage2(
-                              graphQLClient: passClient,
-                            ),
+                            child: fgresetPassword(),
                             type: PageTransitionType.rightToLeft));
                   }),
                   child: Text(
@@ -253,11 +205,7 @@ class _logPageState extends State<logPage> {
               SizedBox(
                 height: h * 0.04,
               ),
-              textandbutton(),
-              SizedBox(
-                height: h * 0.001,
-              ),
-              forgotandbutton()
+              //textandbutton(),
             ],
           ),
         ),

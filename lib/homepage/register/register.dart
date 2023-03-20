@@ -211,60 +211,47 @@ class _regisPageState extends State<regisPage> {
                   height: h * 0.06,
                   child: ElevatedButton(
                     onPressed: (() async {
-                      await FirebaseAuth.instance.verifyPhoneNumber(
-                        phoneNumber: '+66${phoneController.text}',
-                        verificationCompleted:
-                            (PhoneAuthCredential credential) async {
-                          // Auto-retrieve the SMS code on Android devices.
-                          await FirebaseAuth.instance
-                              .signInWithCredential(credential);
-                        },
-                        verificationFailed: (FirebaseAuthException e) {
-                          if (e.code == 'invalid-phone-number') {
-                            print('The provided phone number is not valid.');
-                          }
-                        },
-                        codeSent: (String verificationId, int? resendToken) {
-                          // Navigate to the second page to input OTP code.
-                          if (_formKey.currentState?.validate() == true) {
-                            // handle valid input here
-                            String phoneNumber = phoneController.text;
-                            if (phoneNumber.length != 10) {
-                              ScaffoldMessenger.of(context).showSnackBar(
-                                SnackBar(
-                                  content:
-                                      Text('โปรดใส่เบอร์โทรศัพท์ให้ถูกต้อง'),
-                                ),
-                              );
-                              return;
-                            }
-                            Navigator.pushReplacement(
-                                context,
-                                PageTransition(
-                                    child: registerpage2(
-                                      graphQLClient: passClient,
-                                      verificationId: verificationId,
-                                    ),
-                                    type: PageTransitionType.rightToLeft));
-                          } else {
-                            ScaffoldMessenger.of(context).showSnackBar(
-                              SnackBar(
-                                content:
-                                    Text('Please fix the errors in the form'),
-                              ),
-                            );
-                          }
-                          Navigator.pushReplacement(
-                              context,
-                              PageTransition(
-                                  child: registerpage2(
-                                    graphQLClient: passClient,
-                                    verificationId: verificationId,
-                                  ),
-                                  type: PageTransitionType.rightToLeft));
-                        },
-                        codeAutoRetrievalTimeout: (String verificationId) {},
-                      );
+                      if (_formKey.currentState!.validate()) {
+                        if (phoneController.text.trim().isEmpty) {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            SnackBar(
+                              content: Text('โปรดใส่เบอร์โทรศัพท์ของคุณ'),
+                              duration: Duration(seconds: 2),
+                            ),
+                          );
+                        } else {
+                          await FirebaseAuth.instance.verifyPhoneNumber(
+                            phoneNumber: '+66${phoneController.text}',
+                            verificationCompleted:
+                                (PhoneAuthCredential credential) async {
+                              // Auto-retrieve the SMS code on Android devices.
+                              await FirebaseAuth.instance
+                                  .signInWithCredential(credential);
+                            },
+                            verificationFailed: (FirebaseAuthException e) {
+                              if (e.code == 'invalid-phone-number') {
+                                print(
+                                    'The provided phone number is not valid.');
+                              }
+                            },
+                            codeSent:
+                                (String verificationId, int? resendToken) {
+                              // Navigate to the second page to input OTP code.
+
+                              Navigator.pushReplacement(
+                                  context,
+                                  PageTransition(
+                                      child: registerpage2(
+                                        graphQLClient: passClient,
+                                        verificationId: verificationId,
+                                      ),
+                                      type: PageTransitionType.rightToLeft));
+                            },
+                            codeAutoRetrievalTimeout:
+                                (String verificationId) {},
+                          );
+                        }
+                      }
                     }),
                     child: Text(
                       'ถัดไป',
