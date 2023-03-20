@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -50,6 +52,8 @@ class regisOtpPage extends StatefulWidget {
 
 class _RegisOtpPageState extends State<regisOtpPage> {
   FirebaseAuth _auth = FirebaseAuth.instance;
+  bool _otpSent = false;
+
   _RegisOtpPageState(
       {required this.passClient, required this.useVerificationId});
   final String useVerificationId;
@@ -68,6 +72,31 @@ class _RegisOtpPageState extends State<regisOtpPage> {
     keyboardType: TextInputType.text,
     autocorrect: false,
   );
+
+  @override
+  void initState() {
+    super.initState();
+    _startTimer();
+  }
+
+  StreamController<int> _otpTimerController = StreamController<int>();
+
+  void _startTimer() {
+    const oneSecond = const Duration(seconds: 1);
+    int remainingSeconds = 30;
+    Timer.periodic(
+      oneSecond,
+      (Timer timer) {
+        remainingSeconds--;
+        if (remainingSeconds <= 0) {
+          timer.cancel();
+          _otpTimerController.add(-1); // signal that the timer has ended
+        } else {
+          _otpTimerController.add(remainingSeconds);
+        }
+      },
+    );
+  }
 
   Widget otPinput() {
     double w = displayWidth(context);
@@ -298,6 +327,23 @@ class _RegisOtpPageState extends State<regisOtpPage> {
                   ),
                 ],
               ),*/
+
+              StreamBuilder<int>(
+                stream: _otpTimerController.stream,
+                initialData: 30,
+                builder: (BuildContext context, AsyncSnapshot<int> snapshot) {
+                  if (snapshot.data == -1) {
+                    return ElevatedButton(
+                      onPressed: () {
+                        // Code to resend the OTP
+                      },
+                      child: Text('Resend OTP'),
+                    );
+                  } else {
+                    return Text('Remaining time: ${snapshot.data}');
+                  }
+                },
+              ),
               SizedBox(
                 height: h * 0.12,
               ),
