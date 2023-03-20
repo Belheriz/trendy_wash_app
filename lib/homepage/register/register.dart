@@ -40,7 +40,7 @@ class regisPage extends StatefulWidget {
 
 class _regisPageState extends State<regisPage> {
   FirebaseAuth _auth = FirebaseAuth.instance;
-  GlobalKey<ScaffoldState> scaffoldKey = GlobalKey();
+  final _formKey = GlobalKey<FormState>();
   //
   TextEditingController phoneController = TextEditingController();
   //
@@ -85,13 +85,19 @@ class _regisPageState extends State<regisPage> {
         validator: (value) {
           if (value == null || value.isEmpty) {
             return 'กรุณาใส่เบอร์โทรศัพท์ของท่าน';
+          }
+          if (value.length != 10) {
+            return 'เบอร์โทรศัพท์ไม่ถูกต้อง';
+          }
+          if (!RegExp(r'^\d{10}$').hasMatch(value)) {
+            return 'เบอร์โทรศัพท์ไม่ถูกต้องกรุณาใส่ใหม่';
           } else {
             return null;
           }
         },
         decoration: InputDecoration(
             contentPadding: EdgeInsets.all(10), border: InputBorder.none),
-        keyboardType: TextInputType.text,
+        keyboardType: TextInputType.phone,
         autocorrect: false,
       ),
     );
@@ -182,57 +188,104 @@ class _regisPageState extends State<regisPage> {
     double h = displayHeight(context);
     return SafeArea(
       child: Scaffold(
-        key: scaffoldKey,
-        body: Center(
-          child: Column(
-            //mainAxisAlignment: MainAxisAlignment.center,
-            children: <Widget>[
-              showlogo(),
-              SizedBox(
-                height: h * 0.02,
-              ),
-              textshowlogin(),
-              SizedBox(
-                height: h * 0.1,
-              ),
-              phoneinput(),
-              SizedBox(
-                height: h * 0.12,
-              ),
-              Container(
-                width: w * 0.8,
-                height: h * 0.06,
-                child: ElevatedButton(
-                  onPressed: (() {
-                    Navigator.push(
-                        context,
-                        PageTransition(
-                            child: registerpage2(
-                              graphQLClient: passClient,
-                              verificationId: _verificationId,
-                            ),
-                            type: PageTransitionType.rightToLeft));
-                    requestVerifyCode();
-                  }),
-                  child: Text(
-                    'ถัดไป',
-                    style: TextStyle(
-                      fontSize: 16,
-                      fontWeight: FontWeight.bold,
+        body: Form(
+          key: _formKey,
+          child: Center(
+            child: Column(
+              //mainAxisAlignment: MainAxisAlignment.center,
+              children: <Widget>[
+                showlogo(),
+                SizedBox(
+                  height: h * 0.02,
+                ),
+                textshowlogin(),
+                SizedBox(
+                  height: h * 0.1,
+                ),
+                phoneinput(),
+                SizedBox(
+                  height: h * 0.12,
+                ),
+                Container(
+                  width: w * 0.8,
+                  height: h * 0.06,
+                  child: ElevatedButton(
+                    onPressed: (() async {
+                      await FirebaseAuth.instance.verifyPhoneNumber(
+                        phoneNumber: '+66${phoneController.text}',
+                        verificationCompleted:
+                            (PhoneAuthCredential credential) async {
+                          // Auto-retrieve the SMS code on Android devices.
+                          await FirebaseAuth.instance
+                              .signInWithCredential(credential);
+                        },
+                        verificationFailed: (FirebaseAuthException e) {
+                          if (e.code == 'invalid-phone-number') {
+                            print('The provided phone number is not valid.');
+                          }
+                        },
+                        codeSent: (String verificationId, int? resendToken) {
+                          // Navigate to the second page to input OTP code.
+                          if (_formKey.currentState?.validate() == true) {
+                            // handle valid input here
+                            String phoneNumber = phoneController.text;
+                            if (phoneNumber.length != 10) {
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                SnackBar(
+                                  content:
+                                      Text('โปรดใส่เบอร์โทรศัพท์ให้ถูกต้อง'),
+                                ),
+                              );
+                              return;
+                            }
+                            Navigator.pushReplacement(
+                                context,
+                                PageTransition(
+                                    child: registerpage2(
+                                      graphQLClient: passClient,
+                                      verificationId: verificationId,
+                                    ),
+                                    type: PageTransitionType.rightToLeft));
+                          } else {
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              SnackBar(
+                                content:
+                                    Text('Please fix the errors in the form'),
+                              ),
+                            );
+                          }
+                          Navigator.pushReplacement(
+                              context,
+                              PageTransition(
+                                  child: registerpage2(
+                                    graphQLClient: passClient,
+                                    verificationId: verificationId,
+                                  ),
+                                  type: PageTransitionType.rightToLeft));
+                        },
+                        codeAutoRetrievalTimeout: (String verificationId) {},
+                      );
+                    }),
+                    child: Text(
+                      'ถัดไป',
+                      style: TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Color.fromRGBO(9, 59, 158, 70),
+                      shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(18)),
                     ),
                   ),
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: Color.fromRGBO(9, 59, 158, 70),
-                    shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(18)),
-                  ),
                 ),
-              ),
-              SizedBox(
-                height: 20,
-              ),
-              textandbutton(),
-            ],
+                SizedBox(
+                  height: 20,
+                ),
+                textandbutton(),
+              ],
+            ),
           ),
         ),
       ),
