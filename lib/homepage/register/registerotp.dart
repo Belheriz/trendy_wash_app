@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -50,8 +52,17 @@ class regisOtpPage extends StatefulWidget {
 
 class _RegisOtpPageState extends State<regisOtpPage> {
   FirebaseAuth _auth = FirebaseAuth.instance;
+
   _RegisOtpPageState(
       {required this.passClient, required this.useVerificationId});
+
+  //
+  //
+  //
+  //
+  //
+  //
+
   final String useVerificationId;
   final ValueNotifier<GraphQLClient> passClient;
   TextEditingController otpController = TextEditingController();
@@ -68,6 +79,11 @@ class _RegisOtpPageState extends State<regisOtpPage> {
     keyboardType: TextInputType.text,
     autocorrect: false,
   );
+
+  @override
+  void initState() {
+    super.initState();
+  }
 
   Widget otPinput() {
     double w = displayWidth(context);
@@ -298,6 +314,7 @@ class _RegisOtpPageState extends State<regisOtpPage> {
                   ),
                 ],
               ),*/
+
               SizedBox(
                 height: h * 0.12,
               ),
