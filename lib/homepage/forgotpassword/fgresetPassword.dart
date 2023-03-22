@@ -9,8 +9,10 @@ import 'package:trendy_mobile_1/homepage/size_helper.dart';
 
 class fgresetPassword extends StatelessWidget {
   const fgresetPassword({
+    required this.graphQLClient,
     super.key,
   });
+  final ValueNotifier<GraphQLClient> graphQLClient;
 
   @override
   Widget build(BuildContext context) {
@@ -19,26 +21,29 @@ class fgresetPassword extends StatelessWidget {
       theme: ThemeData(
         primarySwatch: Colors.blue,
       ),
-      home: logPage(
+      home: fgresetPassPage(
         title: 'Flutter Demo Home Page',
+        passClient: graphQLClient,
       ),
     );
   }
 }
 
-class logPage extends StatefulWidget {
-  const logPage({
-    super.key,
-    required this.title,
-  });
-
+class fgresetPassPage extends StatefulWidget {
+  const fgresetPassPage(
+      {super.key, required this.title, required this.passClient});
+  final ValueNotifier<GraphQLClient> passClient;
   final String title;
 
   @override
-  State<logPage> createState() => _logPageState();
+  State<fgresetPassPage> createState() =>
+      _fgresetPassPageState(usedclient: passClient);
 }
 
-class _logPageState extends State<logPage> {
+class _fgresetPassPageState extends State<fgresetPassPage> {
+  _fgresetPassPageState({required this.usedclient});
+  final ValueNotifier<GraphQLClient> usedclient;
+
   TextFormField _textphone = new TextFormField(
     validator: (value) {
       if (value == null || value.isEmpty) {
@@ -185,7 +190,9 @@ class _logPageState extends State<logPage> {
                     Navigator.push(
                         context,
                         PageTransition(
-                            child: fgconfirmPassword(),
+                            child: fgconfirmPassword(
+                              graphQLClient: usedclient,
+                            ),
                             type: PageTransitionType.rightToLeft));
                   }),
                   child: Text(

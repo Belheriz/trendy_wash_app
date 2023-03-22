@@ -185,7 +185,9 @@ class _logPageState extends State<logPage> {
               Navigator.push(
                   context,
                   PageTransition(
-                      child: fgNumberinput(),
+                      child: fgNumberinput(
+                        graphQLClient: passClient,
+                      ),
                       type: PageTransitionType.rightToLeft));
             },
             style: ElevatedButton.styleFrom(

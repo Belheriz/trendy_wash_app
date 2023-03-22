@@ -13,9 +13,13 @@ import 'package:trendy_mobile_1/homepage/size_helper.dart';
 
 class registerpageotp extends StatelessWidget {
   const registerpageotp(
-      {super.key, required this.graphQLClient, required this.verificationId});
+      {super.key,
+      required this.graphQLClient,
+      required this.verificationId,
+      required this.passPhController});
   final ValueNotifier<GraphQLClient> graphQLClient;
   final String verificationId;
+  final TextEditingController passPhController;
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
@@ -28,6 +32,7 @@ class registerpageotp extends StatelessWidget {
         title: 'Flutter Demo Home Page',
         client: graphQLClient,
         passVerification: verificationId,
+        passPh: passPhController,
       ),
     );
   }
@@ -38,15 +43,18 @@ class regisOtpPage extends StatefulWidget {
       {super.key,
       required this.title,
       required this.client,
-      required this.passVerification});
+      required this.passVerification,
+      required this.passPh});
   final ValueNotifier<GraphQLClient> client;
   final String title;
   final String passVerification;
+  final TextEditingController passPh;
 
   @override
   State<regisOtpPage> createState() => _RegisOtpPageState(
         passClient: client,
         useVerificationId: passVerification,
+        PhoneController: passPh,
       );
 }
 
@@ -54,7 +62,9 @@ class _RegisOtpPageState extends State<regisOtpPage> {
   FirebaseAuth _auth = FirebaseAuth.instance;
 
   _RegisOtpPageState(
-      {required this.passClient, required this.useVerificationId});
+      {required this.passClient,
+      required this.useVerificationId,
+      required this.PhoneController});
 
   //
   //
@@ -62,7 +72,7 @@ class _RegisOtpPageState extends State<regisOtpPage> {
   //
   //
   //
-
+  final TextEditingController PhoneController;
   final String useVerificationId;
   final ValueNotifier<GraphQLClient> passClient;
   TextEditingController otpController = TextEditingController();
@@ -88,7 +98,8 @@ class _RegisOtpPageState extends State<regisOtpPage> {
   Widget otPinput() {
     double w = displayWidth(context);
     return Container(
-      margin: EdgeInsets.only(left: w * 0.05, right: w * 0.05),
+      width: w * 0.5,
+      //  margin: EdgeInsets.only(left: w * 0.05, right: w * 0.05),
       decoration: BoxDecoration(
           color: Color.fromARGB(255, 240, 240, 240),
           border: Border.all(width: 1.2, color: Colors.cyanAccent),
@@ -236,7 +247,63 @@ class _RegisOtpPageState extends State<regisOtpPage> {
               SizedBox(
                 height: h * 0.1,
               ),
-              otPinput(),
+              Container(
+                margin: EdgeInsets.only(
+                  left: w * 0.05,
+                  right: w * 0.03,
+                ),
+                child: Row(
+                  children: [
+                    otPinput(),
+                    SizedBox(
+                      width: w * 0.07,
+                    ),
+                    Container(
+                      width: w * 0.28,
+                      height: h * 0.04,
+                      child: ElevatedButton(
+                        onPressed: () async {
+                          await FirebaseAuth.instance.verifyPhoneNumber(
+                            phoneNumber: '+66${PhoneController.text}',
+                            verificationCompleted:
+                                (PhoneAuthCredential credential) async {
+                              // Auto-retrieve the SMS code on Android devices.
+                              await FirebaseAuth.instance
+                                  .signInWithCredential(credential);
+                            },
+                            verificationFailed: (FirebaseAuthException e) {
+                              if (e.code == 'invalid-phone-number') {
+                                print(
+                                    'The provided phone number is not valid.');
+                              }
+                            },
+                            codeSent:
+                                (String verificationId, int? resendToken) {
+                              // Navigate to the second page to input OTP code.
+                            },
+                            codeAutoRetrievalTimeout:
+                                (String verificationId) {},
+                          );
+                        },
+                        child: Text(
+                          'Resend',
+                          style: TextStyle(
+                            color: Colors.white,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: Colors.red,
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(18),
+                          ),
+                        ),
+                      ),
+                    )
+                  ],
+                ),
+              ),
+
               /*Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
