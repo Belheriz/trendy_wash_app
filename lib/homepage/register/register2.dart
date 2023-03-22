@@ -9,9 +9,13 @@ import 'package:trendy_mobile_1/homepage/size_helper.dart';
 
 class registerpage2 extends StatelessWidget {
   const registerpage2(
-      {super.key, required this.graphQLClient, required this.verificationId});
+      {super.key,
+      required this.graphQLClient,
+      required this.verificationId,
+      required this.passPhoneControl});
   final ValueNotifier<GraphQLClient> graphQLClient;
   final String verificationId;
+  final TextEditingController passPhoneControl;
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
@@ -24,6 +28,7 @@ class registerpage2 extends StatelessWidget {
         title: 'Flutter Demo Home Page',
         client: graphQLClient,
         verification: verificationId,
+        passcontrol: passPhoneControl,
       ),
     );
   }
@@ -34,22 +39,29 @@ class regis2Page extends StatefulWidget {
       {super.key,
       required this.title,
       required this.client,
-      required this.verification});
+      required this.verification,
+      required this.passcontrol});
   final String verification;
   final ValueNotifier<GraphQLClient> client;
   final String title;
+  final TextEditingController passcontrol;
 
   @override
   State<regis2Page> createState() => _regis2PageState(
         passClient: client,
         passVerifacation: verification,
+        usedController: passcontrol,
       );
 }
 
 class _regis2PageState extends State<regis2Page> {
-  _regis2PageState({required this.passClient, required this.passVerifacation});
+  _regis2PageState(
+      {required this.passClient,
+      required this.passVerifacation,
+      required this.usedController});
   final String passVerifacation;
   final ValueNotifier<GraphQLClient> passClient;
+  final TextEditingController usedController;
   TextFormField _textpassword = new TextFormField(
     validator: (value) {
       if (value == null || value.isEmpty) {
@@ -189,6 +201,7 @@ class _regis2PageState extends State<regis2Page> {
                             child: registerpageotp(
                               graphQLClient: passClient,
                               verificationId: passVerifacation,
+                              passPhController: usedController,
                             ),
                             type: PageTransitionType.rightToLeft));
                   }),

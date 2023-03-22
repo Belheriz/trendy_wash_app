@@ -1,3 +1,4 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:graphql_flutter/graphql_flutter.dart';
@@ -8,10 +9,10 @@ import 'package:trendy_mobile_1/homepage/register/register.dart';
 import 'package:trendy_mobile_1/homepage/size_helper.dart';
 
 class fgotpinput extends StatelessWidget {
-  const fgotpinput({
-    super.key,
-  });
-
+  const fgotpinput(
+      {super.key, required this.graphQLClient, required this.verificationId});
+  final ValueNotifier<GraphQLClient> graphQLClient;
+  final String verificationId;
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
@@ -19,42 +20,39 @@ class fgotpinput extends StatelessWidget {
       theme: ThemeData(
         primarySwatch: Colors.blue,
       ),
-      home: logPage(
+      home: fgotpPage(
         title: 'Flutter Demo Home Page',
+        passClient: graphQLClient,
+        passVerification: verificationId,
       ),
     );
   }
 }
 
-class logPage extends StatefulWidget {
-  const logPage({
-    super.key,
-    required this.title,
-  });
-
+class fgotpPage extends StatefulWidget {
+  const fgotpPage(
+      {super.key,
+      required this.title,
+      required this.passClient,
+      required this.passVerification});
+  final ValueNotifier<GraphQLClient> passClient;
   final String title;
-
+  final String passVerification;
   @override
-  State<logPage> createState() => _logPageState();
+  State<fgotpPage> createState() => _fgotpPageState(
+        usedClient: passClient,
+        usedVerification: passVerification,
+      );
 }
 
-class _logPageState extends State<logPage> {
-  TextFormField _textphone = new TextFormField(
-    validator: (value) {
-      if (value == null || value.isEmpty) {
-        return 'กรุณาเบอร์โทรศัพท์';
-      } else {
-        return null;
-      }
-    },
-    decoration: InputDecoration(
-      contentPadding: EdgeInsets.all(10),
-      border: InputBorder.none,
-    ),
-    keyboardType: TextInputType.phone,
-    autocorrect: false,
-  );
-
+class _fgotpPageState extends State<fgotpPage> {
+  _fgotpPageState({
+    required this.usedClient,
+    required this.usedVerification,
+  });
+  final ValueNotifier<GraphQLClient> usedClient;
+  final String usedVerification;
+  TextEditingController otpController = TextEditingController();
   Widget phoneinput() {
     double w = displayWidth(context);
     return Container(
@@ -63,7 +61,22 @@ class _logPageState extends State<logPage> {
           color: Color.fromARGB(255, 240, 240, 240),
           border: Border.all(width: 1.2, color: Colors.cyanAccent),
           borderRadius: BorderRadius.all(Radius.circular(18))),
-      child: _textphone,
+      child: TextFormField(
+        validator: (value) {
+          if (value == null || value.isEmpty) {
+            return 'กรุณาเบอร์โทรศัพท์';
+          } else {
+            return null;
+          }
+        },
+        decoration: InputDecoration(
+          contentPadding: EdgeInsets.all(10),
+          border: InputBorder.none,
+        ),
+        keyboardType: TextInputType.phone,
+        autocorrect: false,
+        controller: otpController,
+      ),
     );
   }
 
@@ -181,12 +194,34 @@ class _logPageState extends State<logPage> {
                 width: w * 0.8,
                 height: h * 0.06,
                 child: ElevatedButton(
-                  onPressed: (() {
-                    Navigator.push(
-                        context,
-                        PageTransition(
-                            child: fgresetPassword(),
-                            type: PageTransitionType.rightToLeft));
+                  onPressed: (() async {
+                    try {
+                      final credential = PhoneAuthProvider.credential(
+                        verificationId: usedVerification,
+                        smsCode: otpController.text,
+                      );
+                      await FirebaseAuth.instance
+                          .signInWithCredential(credential);
+                      // Navigate to the home page.
+                      Navigator.pushReplacement(
+                          context,
+                          PageTransition(
+                              child: fgresetPassword(
+                                graphQLClient: usedClient,
+                              ),
+                              type: PageTransitionType.rightToLeft));
+                    } on FirebaseAuthException catch (e) {
+                      if (e.code == 'invalid-verification-code') {
+                        // Display a notification for incorrect OTP code.
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(
+                            content: Text('OTP ไม่ถูกต้อง'),
+                          ),
+                        );
+                      }
+                    } catch (e) {
+                      print(e);
+                    }
                   }),
                   child: Text(
                     'ถัดไป',

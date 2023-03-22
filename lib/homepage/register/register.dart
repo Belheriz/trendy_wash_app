@@ -244,6 +244,7 @@ class _regisPageState extends State<regisPage> {
                                       child: registerpage2(
                                         graphQLClient: passClient,
                                         verificationId: verificationId,
+                                        passPhoneControl: phoneController,
                                       ),
                                       type: PageTransitionType.rightToLeft));
                             },

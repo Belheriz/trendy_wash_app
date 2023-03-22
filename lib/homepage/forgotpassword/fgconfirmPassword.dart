@@ -6,10 +6,11 @@ import 'package:trendy_mobile_1/homepage/login/loginpage2.dart';
 import 'package:trendy_mobile_1/homepage/register/register.dart';
 import 'package:trendy_mobile_1/homepage/size_helper.dart';
 
+import '../login/loginpage.dart';
+
 class fgconfirmPassword extends StatelessWidget {
-  const fgconfirmPassword({
-    super.key,
-  });
+  const fgconfirmPassword({super.key, required this.graphQLClient});
+  final ValueNotifier<GraphQLClient> graphQLClient;
 
   @override
   Widget build(BuildContext context) {
@@ -18,26 +19,28 @@ class fgconfirmPassword extends StatelessWidget {
       theme: ThemeData(
         primarySwatch: Colors.blue,
       ),
-      home: logPage(
+      home: fgconfirmPassPage(
         title: 'Flutter Demo Home Page',
+        passClient: graphQLClient,
       ),
     );
   }
 }
 
-class logPage extends StatefulWidget {
-  const logPage({
-    super.key,
-    required this.title,
-  });
-
+class fgconfirmPassPage extends StatefulWidget {
+  const fgconfirmPassPage(
+      {super.key, required this.title, required this.passClient});
+  final ValueNotifier<GraphQLClient> passClient;
   final String title;
 
   @override
-  State<logPage> createState() => _logPageState();
+  State<fgconfirmPassPage> createState() =>
+      _fgconfirmPassPageState(usedClient: passClient);
 }
 
-class _logPageState extends State<logPage> {
+class _fgconfirmPassPageState extends State<fgconfirmPassPage> {
+  _fgconfirmPassPageState({required this.usedClient});
+  final ValueNotifier<GraphQLClient> usedClient;
   TextFormField _textphone = new TextFormField(
     validator: (value) {
       if (value == null || value.isEmpty) {
@@ -181,11 +184,13 @@ class _logPageState extends State<logPage> {
                 height: h * 0.06,
                 child: ElevatedButton(
                   onPressed: (() {
-                    /* Navigator.push(
+                    Navigator.push(
                         context,
                         PageTransition(
-                            child: loginpage2(),
-                            type: PageTransitionType.rightToLeft));*/
+                            child: loginpage(
+                              graphQLClient: usedClient,
+                            ),
+                            type: PageTransitionType.rightToLeft));
                   }),
                   child: Text(
                     'ถัดไป',

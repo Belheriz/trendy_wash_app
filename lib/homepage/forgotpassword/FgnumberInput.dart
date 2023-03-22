@@ -1,3 +1,4 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:graphql_flutter/graphql_flutter.dart';
@@ -8,10 +9,8 @@ import 'package:trendy_mobile_1/homepage/register/register.dart';
 import 'package:trendy_mobile_1/homepage/size_helper.dart';
 
 class fgNumberinput extends StatelessWidget {
-  const fgNumberinput({
-    super.key,
-  });
-
+  const fgNumberinput({super.key, required this.graphQLClient});
+  final ValueNotifier<GraphQLClient> graphQLClient;
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
@@ -19,42 +18,30 @@ class fgNumberinput extends StatelessWidget {
       theme: ThemeData(
         primarySwatch: Colors.blue,
       ),
-      home: logPage(
+      home: numinputPage(
         title: 'Flutter Demo Home Page',
+        passclient: graphQLClient,
       ),
     );
   }
 }
 
-class logPage extends StatefulWidget {
-  const logPage({
-    super.key,
-    required this.title,
-  });
-
+class numinputPage extends StatefulWidget {
+  const numinputPage(
+      {super.key, required this.title, required this.passclient});
+  final ValueNotifier<GraphQLClient> passclient;
   final String title;
 
   @override
-  State<logPage> createState() => _logPageState();
+  State<numinputPage> createState() =>
+      _numinputPageState(usedClient: passclient);
 }
 
-class _logPageState extends State<logPage> {
-  TextFormField _textphone = new TextFormField(
-    validator: (value) {
-      if (value == null || value.isEmpty) {
-        return 'กรุณาเบอร์โทรศัพท์';
-      } else {
-        return null;
-      }
-    },
-    decoration: InputDecoration(
-      contentPadding: EdgeInsets.all(10),
-      border: InputBorder.none,
-    ),
-    keyboardType: TextInputType.phone,
-    autocorrect: false,
-  );
+class _numinputPageState extends State<numinputPage> {
+  _numinputPageState({required this.usedClient});
+  final ValueNotifier<GraphQLClient> usedClient;
 
+  TextEditingController phoneController = TextEditingController();
   Widget phoneinput() {
     double w = displayWidth(context);
     return Container(
@@ -63,7 +50,22 @@ class _logPageState extends State<logPage> {
           color: Color.fromARGB(255, 240, 240, 240),
           border: Border.all(width: 1.2, color: Colors.cyanAccent),
           borderRadius: BorderRadius.all(Radius.circular(18))),
-      child: _textphone,
+      child: TextFormField(
+        validator: (value) {
+          if (value == null || value.isEmpty) {
+            return 'กรุณาเบอร์โทรศัพท์';
+          } else {
+            return null;
+          }
+        },
+        decoration: InputDecoration(
+          contentPadding: EdgeInsets.all(10),
+          border: InputBorder.none,
+        ),
+        keyboardType: TextInputType.phone,
+        autocorrect: false,
+        controller: phoneController,
+      ),
     );
   }
 
@@ -181,12 +183,34 @@ class _logPageState extends State<logPage> {
                 width: w * 0.8,
                 height: h * 0.06,
                 child: ElevatedButton(
-                  onPressed: (() {
-                    Navigator.push(
-                        context,
-                        PageTransition(
-                            child: fgotpinput(),
-                            type: PageTransitionType.rightToLeft));
+                  onPressed: (() async {
+                    await FirebaseAuth.instance.verifyPhoneNumber(
+                      phoneNumber: '+66${phoneController.text}',
+                      verificationCompleted:
+                          (PhoneAuthCredential credential) async {
+                        // Auto-retrieve the SMS code on Android devices.
+                        await FirebaseAuth.instance
+                            .signInWithCredential(credential);
+                      },
+                      verificationFailed: (FirebaseAuthException e) {
+                        if (e.code == 'invalid-phone-number') {
+                          print('The provided phone number is not valid.');
+                        }
+                      },
+                      codeSent: (String verificationId, int? resendToken) {
+                        // Navigate to the second page to input OTP code.
+                        Navigator.push(
+                            context,
+                            PageTransition(
+                                child: fgotpinput(
+                                  graphQLClient: usedClient,
+                                  verificationId: verificationId,
+                                ),
+                                type: PageTransitionType.rightToLeft));
+                        ;
+                      },
+                      codeAutoRetrievalTimeout: (String verificationId) {},
+                    );
                   }),
                   child: Text(
                     'ถัดไป',
