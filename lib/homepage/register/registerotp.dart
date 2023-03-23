@@ -122,7 +122,7 @@ class _RegisOtpPageState extends State<regisOtpPage> {
     \$confirmPassword: String!
     
   ) {
-    startDevice(
+    addUser(
       tel: \$tel
       password: \$password
       confirmPassword: \$confirmPassword
