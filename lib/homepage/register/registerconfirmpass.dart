@@ -4,19 +4,20 @@ import 'package:graphql_flutter/graphql_flutter.dart';
 import 'package:page_transition/page_transition.dart';
 import 'package:trendy_mobile_1/homepage/homepage.dart';
 import 'package:trendy_mobile_1/homepage/login/loginpage.dart';
-import 'package:trendy_mobile_1/homepage/register/registerconfirmpass.dart';
 import 'package:trendy_mobile_1/homepage/register/registerotp.dart';
 import 'package:trendy_mobile_1/homepage/size_helper.dart';
 
-class registerpage2 extends StatelessWidget {
-  const registerpage2(
+class registerConfirmPasspage extends StatelessWidget {
+  const registerConfirmPasspage(
       {super.key,
       required this.graphQLClient,
       required this.verificationId,
-      required this.passPhoneControl});
+      required this.passPhoneControl,
+      required this.passwordControl});
   final ValueNotifier<GraphQLClient> graphQLClient;
   final String verificationId;
   final TextEditingController passPhoneControl;
+  final TextEditingController passwordControl;
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
@@ -25,45 +26,51 @@ class registerpage2 extends StatelessWidget {
         primarySwatch: Colors.blue,
         fontFamily: 'LineseedsanRg',
       ),
-      home: regis2Page(
+      home: regisConfirmPassPage(
         title: 'Flutter Demo Home Page',
         client: graphQLClient,
         verification: verificationId,
         passcontrol: passPhoneControl,
+        Password: passwordControl,
       ),
     );
   }
 }
 
-class regis2Page extends StatefulWidget {
-  const regis2Page(
+class regisConfirmPassPage extends StatefulWidget {
+  const regisConfirmPassPage(
       {super.key,
       required this.title,
       required this.client,
       required this.verification,
-      required this.passcontrol});
+      required this.passcontrol,
+      required this.Password});
   final String verification;
   final ValueNotifier<GraphQLClient> client;
   final String title;
   final TextEditingController passcontrol;
+  final TextEditingController Password;
 
   @override
-  State<regis2Page> createState() => _regis2PageState(
+  State<regisConfirmPassPage> createState() => _regisConfirmPassPageState(
         passClient: client,
         passVerifacation: verification,
         phoneController: passcontrol,
+        usedPassword: Password,
       );
 }
 
-class _regis2PageState extends State<regis2Page> {
-  _regis2PageState(
+class _regisConfirmPassPageState extends State<regisConfirmPassPage> {
+  _regisConfirmPassPageState(
       {required this.passClient,
       required this.passVerifacation,
-      required this.phoneController});
+      required this.phoneController,
+      required this.usedPassword});
   final String passVerifacation;
   final ValueNotifier<GraphQLClient> passClient;
   final TextEditingController phoneController;
-  TextEditingController passwordController = TextEditingController();
+  final TextEditingController usedPassword;
+  TextEditingController ConfirmpasswordController = TextEditingController();
   final _formKey = GlobalKey<FormState>();
 
   Widget passwordinput() {
@@ -86,7 +93,7 @@ class _regis2PageState extends State<regis2Page> {
             contentPadding: EdgeInsets.all(10), border: InputBorder.none),
         keyboardType: TextInputType.text,
         autocorrect: false,
-        controller: passwordController,
+        controller: ConfirmpasswordController,
       ),
     );
   }
@@ -122,7 +129,7 @@ class _regis2PageState extends State<regis2Page> {
           ),
           Container(
             child: Text(
-              'ตั้งรหัสผ่านของท่าน',
+              'กรุณาใส่รหัสผ่านของท่านอีกครั้งเพื่อยืนยัน',
               style: TextStyle(fontSize: 18),
             ),
           )
@@ -201,10 +208,18 @@ class _regis2PageState extends State<regis2Page> {
                   child: ElevatedButton(
                     onPressed: (() {
                       if (_formKey.currentState!.validate()) {
-                        if (passwordController.text.trim().isEmpty) {
+                        if (ConfirmpasswordController.text.trim().isEmpty) {
                           ScaffoldMessenger.of(context).showSnackBar(
                             SnackBar(
                               content: Text('โปรดใส่รหัสผ่านของคุณ'),
+                              duration: Duration(seconds: 2),
+                            ),
+                          );
+                        } else if (usedPassword.text !=
+                            ConfirmpasswordController.text) {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            SnackBar(
+                              content: Text('รหัสผ่านของคุณไม่ถูกต้อง'),
                               duration: Duration(seconds: 2),
                             ),
                           );
@@ -212,11 +227,13 @@ class _regis2PageState extends State<regis2Page> {
                           Navigator.pushReplacement(
                               context,
                               PageTransition(
-                                  child: registerConfirmPasspage(
+                                  child: registerpageotp(
                                     graphQLClient: passClient,
                                     verificationId: passVerifacation,
-                                    passPhoneControl: phoneController,
-                                    passwordControl: passwordController,
+                                    passPhController: phoneController,
+                                    passwordControl: usedPassword,
+                                    confirmpasswordControl:
+                                        ConfirmpasswordController,
                                   ),
                                   type: PageTransitionType.rightToLeft));
                         }

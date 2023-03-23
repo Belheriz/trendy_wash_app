@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:io';
 
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
@@ -11,60 +12,101 @@ import 'package:trendy_mobile_1/homepage/homepage.dart';
 import 'package:trendy_mobile_1/homepage/login/loginpage.dart';
 import 'package:trendy_mobile_1/homepage/size_helper.dart';
 
+final HttpLink httpLink = HttpLink(
+  'http://api.graphql.trendywash.net:3001/graphql',
+);
+
+ValueNotifier<GraphQLClient> client = ValueNotifier(
+  GraphQLClient(
+    link: httpLink,
+    cache: GraphQLCache(),
+  ),
+);
+
+class MyHttpOverrides extends HttpOverrides {
+  @override
+  HttpClient createHttpClient(SecurityContext? context) {
+    HttpClient client = super.createHttpClient(context);
+    client.badCertificateCallback =
+        (X509Certificate cert, String host, int port) => true;
+    return client;
+  }
+}
+
 class registerpageotp extends StatelessWidget {
-  const registerpageotp(
-      {super.key,
-      required this.graphQLClient,
-      required this.verificationId,
-      required this.passPhController});
+  const registerpageotp({
+    super.key,
+    required this.graphQLClient,
+    required this.verificationId,
+    required this.passPhController,
+    required this.passwordControl,
+    required this.confirmpasswordControl,
+  });
   final ValueNotifier<GraphQLClient> graphQLClient;
   final String verificationId;
   final TextEditingController passPhController;
+  final TextEditingController passwordControl;
+  final TextEditingController confirmpasswordControl;
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'Flutter Demo',
-      theme: ThemeData(
-        primarySwatch: Colors.blue,
-        fontFamily: 'LineseedsanRg',
-      ),
-      home: regisOtpPage(
-        title: 'Flutter Demo Home Page',
-        client: graphQLClient,
-        passVerification: verificationId,
-        passPh: passPhController,
+    return GraphQLProvider(
+      client: client,
+      child: MaterialApp(
+        title: 'Flutter Demo',
+        theme: ThemeData(
+          primarySwatch: Colors.blue,
+          fontFamily: 'LineseedsanRg',
+        ),
+        home: regisOtpPage(
+          title: 'Flutter Demo Home Page',
+          client: graphQLClient,
+          passVerification: verificationId,
+          passPh: passPhController,
+          Password: passwordControl,
+          ConfirmPassword: confirmpasswordControl,
+        ),
       ),
     );
   }
 }
 
 class regisOtpPage extends StatefulWidget {
-  const regisOtpPage(
-      {super.key,
-      required this.title,
-      required this.client,
-      required this.passVerification,
-      required this.passPh});
+  const regisOtpPage({
+    super.key,
+    required this.title,
+    required this.client,
+    required this.passVerification,
+    required this.passPh,
+    required this.Password,
+    required this.ConfirmPassword,
+  });
   final ValueNotifier<GraphQLClient> client;
   final String title;
   final String passVerification;
   final TextEditingController passPh;
+  final TextEditingController Password;
+  final TextEditingController ConfirmPassword;
 
   @override
   State<regisOtpPage> createState() => _RegisOtpPageState(
         passClient: client,
         useVerificationId: passVerification,
         PhoneController: passPh,
+        useConfirmPassword: ConfirmPassword,
+        usedPassword: Password,
       );
 }
 
 class _RegisOtpPageState extends State<regisOtpPage> {
   FirebaseAuth _auth = FirebaseAuth.instance;
 
-  _RegisOtpPageState(
-      {required this.passClient,
-      required this.useVerificationId,
-      required this.PhoneController});
+  _RegisOtpPageState({
+    required this.passClient,
+    required this.useVerificationId,
+    required this.PhoneController,
+    required this.usedPassword,
+    required this.useConfirmPassword,
+  });
 
   //
   //
@@ -72,6 +114,59 @@ class _RegisOtpPageState extends State<regisOtpPage> {
   //
   //
   //
+  bool _isLoading = false;
+  String addUserMutation = '''
+  mutation addUser(
+    \$tel: String!
+    \$password: String!
+    \$confirmPassword: String!
+    
+  ) {
+    startDevice(
+      tel: \$tel
+      password: \$password
+      confirmPassword: \$confirmPassword
+      )
+     
+  }
+''';
+
+  void _addUser(BuildContext context, String tel, String password,
+      String confirmPassword) async {
+    setState(() {
+      _isLoading = true;
+    });
+
+    final QueryResult result = await GraphQLProvider.of(context).value.mutate(
+          MutationOptions(document: gql(addUserMutation), variables: {
+            'tel': tel,
+            'password': password,
+            'confirmPassword': confirmPassword,
+          }),
+        );
+    setState(() {
+      _isLoading = false;
+    });
+
+    if (result.hasException) {
+      showDialog(
+        context: context,
+        builder: (_) => AlertDialog(
+          title: const Text('Error'),
+          content: Text(result.exception.toString()),
+          actions: [
+            ElevatedButton(
+              onPressed: () => Navigator.pop(context),
+              child: const Text('OK'),
+            ),
+          ],
+        ),
+      );
+    }
+  }
+
+  final TextEditingController usedPassword;
+  final TextEditingController useConfirmPassword;
   final TextEditingController PhoneController;
   final String useVerificationId;
   final ValueNotifier<GraphQLClient> passClient;
@@ -385,7 +480,65 @@ class _RegisOtpPageState extends State<regisOtpPage> {
               SizedBox(
                 height: h * 0.12,
               ),
-              Container(
+              Mutation(
+                  options: MutationOptions(
+                      document: gql(addUserMutation),
+                      variables: {
+                        'tel': PhoneController.text,
+                        'password': usedPassword.text,
+                        'confirmPassword': useConfirmPassword.text,
+                      }),
+                  builder: (RunMutation runMutation, QueryResult? result) {
+                    return Container(
+                      width: w * 0.8,
+                      height: h * 0.06,
+                      child: ElevatedButton(
+                        onPressed: (() async {
+                          try {
+                            final credential = PhoneAuthProvider.credential(
+                              verificationId: useVerificationId,
+                              smsCode: otpController.text,
+                            );
+                            await FirebaseAuth.instance
+                                .signInWithCredential(credential);
+                            // Navigate to the home page.
+                            runMutation({});
+                            Navigator.pushReplacement(
+                                context,
+                                PageTransition(
+                                    child: bottomNavbar(
+                                      graphQLClient: passClient,
+                                    ),
+                                    type: PageTransitionType.rightToLeft));
+                          } on FirebaseAuthException catch (e) {
+                            if (e.code == 'invalid-verification-code') {
+                              // Display a notification for incorrect OTP code.
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                SnackBar(
+                                  content: Text('OTP ไม่ถูกต้อง'),
+                                ),
+                              );
+                            }
+                          } catch (e) {
+                            print(e);
+                          }
+                        }),
+                        child: Text(
+                          'เสร็จสิ้น',
+                          style: TextStyle(
+                            fontSize: 16,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: Color.fromRGBO(9, 59, 158, 70),
+                          shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(18)),
+                        ),
+                      ),
+                    );
+                  }),
+              /*Container(
                 width: w * 0.8,
                 height: h * 0.06,
                 child: ElevatedButton(
@@ -398,6 +551,12 @@ class _RegisOtpPageState extends State<regisOtpPage> {
                       await FirebaseAuth.instance
                           .signInWithCredential(credential);
                       // Navigate to the home page.
+                      _addUser(
+                        context,
+                        PhoneController.text.trim(),
+                        usedPassword.text.trim(),
+                        useConfirmPassword.text.trim(),
+                      );
                       Navigator.pushReplacement(
                           context,
                           PageTransition(
@@ -431,7 +590,7 @@ class _RegisOtpPageState extends State<regisOtpPage> {
                         borderRadius: BorderRadius.circular(18)),
                   ),
                 ),
-              ),
+              ),*/
               SizedBox(
                 height: h * 0.04,
               ),
