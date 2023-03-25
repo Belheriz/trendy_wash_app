@@ -239,8 +239,31 @@ class _fgconfirmPassPageState extends State<fgconfirmPassPage> {
                   height: h * 0.12,
                 ),
                 Mutation(
-                  options:
-                      MutationOptions(document: gql(forgotPasswordMutation)),
+                  options: MutationOptions(
+                    document: gql(forgotPasswordMutation),
+                    onError: (error) {
+                      print(error);
+                    },
+                    onCompleted: (dynamic resultData) {
+                      print(resultData);
+                      if (resultData?['forgotPasswordUser'] != null) {
+                        Navigator.push(
+                            context,
+                            PageTransition(
+                                child: loginpage(
+                                  graphQLClient: usedClient,
+                                ),
+                                type: PageTransitionType.rightToLeft));
+                      } else {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(
+                            content: Text('ท่านใส่รหัสซ้ำกีบรหัสผ่านเก่า'),
+                            duration: Duration(seconds: 10),
+                          ),
+                        );
+                      }
+                    },
+                  ),
                   builder: (RunMutation runMutation, QueryResult? result) {
                     return Container(
                       width: w * 0.8,
@@ -252,13 +275,6 @@ class _fgconfirmPassPageState extends State<fgconfirmPassPage> {
                             'password': UsedresetPasswordController.text,
                             'confirmPassword': confirmpasswordControl.text,
                           });
-                          Navigator.push(
-                              context,
-                              PageTransition(
-                                  child: loginpage(
-                                    graphQLClient: usedClient,
-                                  ),
-                                  type: PageTransitionType.rightToLeft));
                         }),
                         child: Text(
                           'ถัดไป',

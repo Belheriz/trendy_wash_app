@@ -76,6 +76,8 @@ mutation  loginPhone(
     password:\$password
     ){
       id
+      user_tel
+      user_password
     }
     
   }
@@ -231,13 +233,31 @@ mutation  loginPhone(
                     },
                     onCompleted: (dynamic resultData) {
                       print(resultData);
-                      Navigator.push(
+                      if (resultData?['loginPhone'] != null) {
+                        Navigator.push(
+                            context,
+                            PageTransition(
+                                child: bottomNavbar(
+                                  graphQLClient: passClient,
+                                ),
+                                type: PageTransitionType.rightToLeft));
+                      } else {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(
+                            content: Text(
+                                'เบอร์โทรศัพท์หรือรหัสผ่านของท่านไม่ถูกต้อง'),
+                            duration: Duration(seconds: 10),
+                          ),
+                        );
+                      }
+
+                      /*Navigator.push(
                           context,
                           PageTransition(
                               child: bottomNavbar(
                                 graphQLClient: passClient,
                               ),
-                              type: PageTransitionType.rightToLeft));
+                              type: PageTransitionType.rightToLeft));*/
                     },
                   ),
                   builder: (RunMutation runMutation, QueryResult? result) {
