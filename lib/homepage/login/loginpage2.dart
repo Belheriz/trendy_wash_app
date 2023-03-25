@@ -221,9 +221,23 @@ mutation  loginPhone(
                     document: gql(LoginPhoneMutation),
                     onError: (error) {
                       print(error);
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(
+                          content: Text(
+                              'เบอร์โทรศัพท์หรือรหัสผ่านของท่านไม่ถูกต้อง'),
+                          duration: Duration(seconds: 10),
+                        ),
+                      );
                     },
                     onCompleted: (dynamic resultData) {
                       print(resultData);
+                      Navigator.push(
+                          context,
+                          PageTransition(
+                              child: bottomNavbar(
+                                graphQLClient: passClient,
+                              ),
+                              type: PageTransitionType.rightToLeft));
                     },
                   ),
                   builder: (RunMutation runMutation, QueryResult? result) {
@@ -247,13 +261,6 @@ mutation  loginPhone(
                                   'password': passwordLoginController.text,
                                 },
                               );
-                              Navigator.push(
-                                  context,
-                                  PageTransition(
-                                      child: bottomNavbar(
-                                        graphQLClient: passClient,
-                                      ),
-                                      type: PageTransitionType.rightToLeft));
                             }
                           }
                         }),
