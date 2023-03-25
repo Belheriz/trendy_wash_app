@@ -8,20 +8,44 @@ import 'package:trendy_mobile_1/homepage/size_helper.dart';
 
 import '../login/loginpage.dart';
 
+final HttpLink httpLinkUser = HttpLink(
+  'http://api.graphql.trendywash.net:3001/graphql',
+);
+
+final Link linkUser = httpLinkUser;
+ValueNotifier<GraphQLClient> clientUser = ValueNotifier(
+  GraphQLClient(
+    link: linkUser,
+    cache: GraphQLCache(),
+  ),
+);
+
 class fgconfirmPassword extends StatelessWidget {
-  const fgconfirmPassword({super.key, required this.graphQLClient});
+  const fgconfirmPassword({
+    super.key,
+    required this.graphQLClient,
+    required this.PhoneController,
+    required this.resetPasswordController,
+  });
   final ValueNotifier<GraphQLClient> graphQLClient;
+  final TextEditingController PhoneController;
+  final TextEditingController resetPasswordController;
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'Flutter Demo',
-      theme: ThemeData(
-        primarySwatch: Colors.blue,
-      ),
-      home: fgconfirmPassPage(
-        title: 'Flutter Demo Home Page',
-        passClient: graphQLClient,
+    return GraphQLProvider(
+      client: clientUser,
+      child: MaterialApp(
+        title: 'Flutter Demo',
+        theme: ThemeData(
+          primarySwatch: Colors.blue,
+        ),
+        home: fgconfirmPassPage(
+          title: 'Flutter Demo Home Page',
+          passClient: graphQLClient,
+          passphControl: PhoneController,
+          resetPassControl: resetPasswordController,
+        ),
       ),
     );
   }
@@ -29,35 +53,53 @@ class fgconfirmPassword extends StatelessWidget {
 
 class fgconfirmPassPage extends StatefulWidget {
   const fgconfirmPassPage(
-      {super.key, required this.title, required this.passClient});
+      {super.key,
+      required this.title,
+      required this.passClient,
+      required this.passphControl,
+      required this.resetPassControl});
   final ValueNotifier<GraphQLClient> passClient;
   final String title;
-
+  final TextEditingController passphControl;
+  final TextEditingController resetPassControl;
   @override
-  State<fgconfirmPassPage> createState() =>
-      _fgconfirmPassPageState(usedClient: passClient);
+  State<fgconfirmPassPage> createState() => _fgconfirmPassPageState(
+        usedClient: passClient,
+        UsedPhoneController: passphControl,
+        UsedresetPasswordController: resetPassControl,
+      );
 }
 
 class _fgconfirmPassPageState extends State<fgconfirmPassPage> {
-  _fgconfirmPassPageState({required this.usedClient});
+  _fgconfirmPassPageState({
+    required this.usedClient,
+    required this.UsedPhoneController,
+    required this.UsedresetPasswordController,
+  });
+  final TextEditingController UsedPhoneController;
+  final TextEditingController UsedresetPasswordController;
   final ValueNotifier<GraphQLClient> usedClient;
-  TextFormField _textphone = new TextFormField(
-    validator: (value) {
-      if (value == null || value.isEmpty) {
-        return 'กรุณาเบอร์โทรศัพท์';
-      } else {
-        return null;
+  final _formKey = GlobalKey<FormState>();
+  TextEditingController confirmpasswordControl = TextEditingController();
+  String forgotPasswordMutation = '''
+  mutation forgotPasswordUser(
+    \$tel: String!
+    \$password: String!
+    \$confirmPassword: String!
+    
+  ) {
+    forgotPasswordUser(
+      tel: \$tel
+      password: \$password
+      confirmPassword: \$confirmPassword
+      ){
+        id
       }
-    },
-    decoration: InputDecoration(
-      contentPadding: EdgeInsets.all(10),
-      border: InputBorder.none,
-    ),
-    keyboardType: TextInputType.phone,
-    autocorrect: false,
-  );
+     
+  }
+''';
 
-  Widget phoneinput() {
+  Widget confirmresetPasswordinput() {
     double w = displayWidth(context);
     return Container(
       margin: EdgeInsets.only(left: w * 0.05, right: w * 0.05),
@@ -65,7 +107,22 @@ class _fgconfirmPassPageState extends State<fgconfirmPassPage> {
           color: Color.fromARGB(255, 240, 240, 240),
           border: Border.all(width: 1.2, color: Colors.cyanAccent),
           borderRadius: BorderRadius.all(Radius.circular(18))),
-      child: _textphone,
+      child: TextFormField(
+        validator: (value) {
+          if (value == null || value.isEmpty) {
+            return 'กรุณาใส่รหัสผ่านให้ถูกต้อง';
+          } else {
+            return null;
+          }
+        },
+        decoration: InputDecoration(
+          contentPadding: EdgeInsets.all(10),
+          border: InputBorder.none,
+        ),
+        keyboardType: TextInputType.phone,
+        autocorrect: false,
+        controller: confirmpasswordControl,
+      ),
     );
   }
 
@@ -163,54 +220,69 @@ class _fgconfirmPassPageState extends State<fgconfirmPassPage> {
     double h = displayHeight(context);
     return SafeArea(
       child: Scaffold(
-        body: Center(
-          child: Column(
-            //mainAxisAlignment: MainAxisAlignment.center,
-            children: <Widget>[
-              showlogo(),
-              SizedBox(
-                height: h * 0.02,
-              ),
-              textshowlogin(),
-              SizedBox(
-                height: h * 0.1,
-              ),
-              phoneinput(),
-              SizedBox(
-                height: h * 0.12,
-              ),
-              Container(
-                width: w * 0.8,
-                height: h * 0.06,
-                child: ElevatedButton(
-                  onPressed: (() {
-                    Navigator.push(
-                        context,
-                        PageTransition(
-                            child: loginpage(
-                              graphQLClient: usedClient,
-                            ),
-                            type: PageTransitionType.rightToLeft));
-                  }),
-                  child: Text(
-                    'ถัดไป',
-                    style: TextStyle(
-                      fontFamily: 'LineseedsanBd',
-                      fontSize: 16,
-                    ),
-                  ),
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: Color.fromRGBO(9, 59, 158, 70),
-                    shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(18)),
-                  ),
+        body: Form(
+          key: _formKey,
+          child: Center(
+            child: Column(
+              //mainAxisAlignment: MainAxisAlignment.center,
+              children: <Widget>[
+                showlogo(),
+                SizedBox(
+                  height: h * 0.02,
                 ),
-              ),
-              SizedBox(
-                height: h * 0.04,
-              ),
-              //textandbutton(),
-            ],
+                textshowlogin(),
+                SizedBox(
+                  height: h * 0.1,
+                ),
+                confirmresetPasswordinput(),
+                SizedBox(
+                  height: h * 0.12,
+                ),
+                Mutation(
+                  options:
+                      MutationOptions(document: gql(forgotPasswordMutation)),
+                  builder: (RunMutation runMutation, QueryResult? result) {
+                    return Container(
+                      width: w * 0.8,
+                      height: h * 0.06,
+                      child: ElevatedButton(
+                        onPressed: (() {
+                          runMutation({
+                            'tel': UsedPhoneController.text,
+                            'password': UsedresetPasswordController.text,
+                            'confirmPassword': confirmpasswordControl.text,
+                          });
+                          Navigator.push(
+                              context,
+                              PageTransition(
+                                  child: loginpage(
+                                    graphQLClient: usedClient,
+                                  ),
+                                  type: PageTransitionType.rightToLeft));
+                        }),
+                        child: Text(
+                          'ถัดไป',
+                          style: TextStyle(
+                            fontFamily: 'LineseedsanBd',
+                            fontSize: 16,
+                          ),
+                        ),
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: Color.fromRGBO(9, 59, 158, 70),
+                          shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(18)),
+                        ),
+                      ),
+                    );
+                  },
+                ),
+
+                SizedBox(
+                  height: h * 0.04,
+                ),
+                //textandbutton(),
+              ],
+            ),
           ),
         ),
       ),

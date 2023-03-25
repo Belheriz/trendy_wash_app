@@ -205,6 +205,7 @@ class _numinputPageState extends State<numinputPage> {
                                 child: fgotpinput(
                                   graphQLClient: usedClient,
                                   verificationId: verificationId,
+                                  PhoneController: phoneController,
                                 ),
                                 type: PageTransitionType.rightToLeft));
                         ;

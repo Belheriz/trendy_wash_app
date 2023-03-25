@@ -8,10 +8,9 @@ import 'package:trendy_mobile_1/homepage/register/register.dart';
 import 'package:trendy_mobile_1/homepage/size_helper.dart';
 
 class fgresetPassword extends StatelessWidget {
-  const fgresetPassword({
-    required this.graphQLClient,
-    super.key,
-  });
+  const fgresetPassword(
+      {required this.graphQLClient, super.key, required this.PhoneController});
+  final TextEditingController PhoneController;
   final ValueNotifier<GraphQLClient> graphQLClient;
 
   @override
@@ -24,43 +23,37 @@ class fgresetPassword extends StatelessWidget {
       home: fgresetPassPage(
         title: 'Flutter Demo Home Page',
         passClient: graphQLClient,
+        passPHController: PhoneController,
       ),
     );
   }
 }
 
 class fgresetPassPage extends StatefulWidget {
-  const fgresetPassPage(
-      {super.key, required this.title, required this.passClient});
+  const fgresetPassPage({
+    super.key,
+    required this.title,
+    required this.passClient,
+    required this.passPHController,
+  });
   final ValueNotifier<GraphQLClient> passClient;
   final String title;
-
+  final TextEditingController passPHController;
   @override
-  State<fgresetPassPage> createState() =>
-      _fgresetPassPageState(usedclient: passClient);
+  State<fgresetPassPage> createState() => _fgresetPassPageState(
+      usedclient: passClient, UsedPhoneController: passPHController);
 }
 
 class _fgresetPassPageState extends State<fgresetPassPage> {
-  _fgresetPassPageState({required this.usedclient});
+  _fgresetPassPageState({
+    required this.usedclient,
+    required this.UsedPhoneController,
+  });
   final ValueNotifier<GraphQLClient> usedclient;
+  final TextEditingController UsedPhoneController;
+  TextEditingController resetPasswordController = TextEditingController();
 
-  TextFormField _textphone = new TextFormField(
-    validator: (value) {
-      if (value == null || value.isEmpty) {
-        return 'กรุณาเบอร์โทรศัพท์';
-      } else {
-        return null;
-      }
-    },
-    decoration: InputDecoration(
-      contentPadding: EdgeInsets.all(10),
-      border: InputBorder.none,
-    ),
-    keyboardType: TextInputType.phone,
-    autocorrect: false,
-  );
-
-  Widget phoneinput() {
+  Widget resetPasswordinput() {
     double w = displayWidth(context);
     return Container(
       margin: EdgeInsets.only(left: w * 0.05, right: w * 0.05),
@@ -68,7 +61,22 @@ class _fgresetPassPageState extends State<fgresetPassPage> {
           color: Color.fromARGB(255, 240, 240, 240),
           border: Border.all(width: 1.2, color: Colors.cyanAccent),
           borderRadius: BorderRadius.all(Radius.circular(18))),
-      child: _textphone,
+      child: TextFormField(
+        validator: (value) {
+          if (value == null || value.isEmpty) {
+            return 'กรุณาเบอร์โทรศัพท์';
+          } else {
+            return null;
+          }
+        },
+        decoration: InputDecoration(
+          contentPadding: EdgeInsets.all(10),
+          border: InputBorder.none,
+        ),
+        keyboardType: TextInputType.phone,
+        autocorrect: false,
+        controller: resetPasswordController,
+      ),
     );
   }
 
@@ -178,7 +186,7 @@ class _fgresetPassPageState extends State<fgresetPassPage> {
               SizedBox(
                 height: h * 0.1,
               ),
-              phoneinput(),
+              resetPasswordinput(),
               SizedBox(
                 height: h * 0.12,
               ),
@@ -192,6 +200,8 @@ class _fgresetPassPageState extends State<fgresetPassPage> {
                         PageTransition(
                             child: fgconfirmPassword(
                               graphQLClient: usedclient,
+                              PhoneController: UsedPhoneController,
+                              resetPasswordController: resetPasswordController,
                             ),
                             type: PageTransitionType.rightToLeft));
                   }),

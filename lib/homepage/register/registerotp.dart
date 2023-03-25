@@ -12,26 +12,17 @@ import 'package:trendy_mobile_1/homepage/homepage.dart';
 import 'package:trendy_mobile_1/homepage/login/loginpage.dart';
 import 'package:trendy_mobile_1/homepage/size_helper.dart';
 
-final HttpLink httpLink = HttpLink(
+final HttpLink httpLinkUser = HttpLink(
   'http://api.graphql.trendywash.net:3001/graphql',
 );
 
-ValueNotifier<GraphQLClient> client = ValueNotifier(
+final Link linkUser = httpLinkUser;
+ValueNotifier<GraphQLClient> clientUser = ValueNotifier(
   GraphQLClient(
-    link: httpLink,
+    link: linkUser,
     cache: GraphQLCache(),
   ),
 );
-
-class MyHttpOverrides extends HttpOverrides {
-  @override
-  HttpClient createHttpClient(SecurityContext? context) {
-    HttpClient client = super.createHttpClient(context);
-    client.badCertificateCallback =
-        (X509Certificate cert, String host, int port) => true;
-    return client;
-  }
-}
 
 class registerpageotp extends StatelessWidget {
   const registerpageotp({
@@ -50,7 +41,7 @@ class registerpageotp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return GraphQLProvider(
-      client: client,
+      client: clientUser,
       child: MaterialApp(
         title: 'Flutter Demo',
         theme: ThemeData(
@@ -99,7 +90,7 @@ class regisOtpPage extends StatefulWidget {
 
 class _RegisOtpPageState extends State<regisOtpPage> {
   FirebaseAuth _auth = FirebaseAuth.instance;
-
+  final _formKey = GlobalKey<FormState>();
   _RegisOtpPageState({
     required this.passClient,
     required this.useVerificationId,
@@ -131,59 +122,12 @@ class _RegisOtpPageState extends State<regisOtpPage> {
   }
 ''';
 
-  void _addUser(BuildContext context, String tel, String password,
-      String confirmPassword) async {
-    setState(() {
-      _isLoading = true;
-    });
-
-    final QueryResult result = await GraphQLProvider.of(context).value.mutate(
-          MutationOptions(document: gql(addUserMutation), variables: {
-            'tel': tel,
-            'password': password,
-            'confirmPassword': confirmPassword,
-          }),
-        );
-    setState(() {
-      _isLoading = false;
-    });
-
-    if (result.hasException) {
-      showDialog(
-        context: context,
-        builder: (_) => AlertDialog(
-          title: const Text('Error'),
-          content: Text(result.exception.toString()),
-          actions: [
-            ElevatedButton(
-              onPressed: () => Navigator.pop(context),
-              child: const Text('OK'),
-            ),
-          ],
-        ),
-      );
-    }
-  }
-
   final TextEditingController usedPassword;
   final TextEditingController useConfirmPassword;
   final TextEditingController PhoneController;
   final String useVerificationId;
   final ValueNotifier<GraphQLClient> passClient;
   TextEditingController otpController = TextEditingController();
-  TextFormField _textpassword = new TextFormField(
-    validator: (value) {
-      if (value == null || value.isEmpty) {
-        return 'กรุณาตั้งรหัสผ่าน';
-      } else {
-        return null;
-      }
-    },
-    decoration: InputDecoration(
-        contentPadding: EdgeInsets.all(10), border: InputBorder.none),
-    keyboardType: TextInputType.text,
-    autocorrect: false,
-  );
 
   @override
   void initState() {
@@ -330,272 +274,275 @@ class _RegisOtpPageState extends State<regisOtpPage> {
     double h = displayHeight(context);
     return SafeArea(
       child: Scaffold(
-        body: Center(
-          child: Column(
-            //mainAxisAlignment: MainAxisAlignment.center,
-            children: <Widget>[
-              showlogo(),
-              SizedBox(
-                height: h * 0.02,
-              ),
-              textshowlogin(),
-              SizedBox(
-                height: h * 0.1,
-              ),
-              Container(
-                margin: EdgeInsets.only(
-                  left: w * 0.05,
-                  right: w * 0.03,
+        body: Form(
+          key: _formKey,
+          child: Center(
+            child: Column(
+              //mainAxisAlignment: MainAxisAlignment.center,
+              children: <Widget>[
+                showlogo(),
+                SizedBox(
+                  height: h * 0.02,
                 ),
-                child: Row(
-                  children: [
-                    otPinput(),
-                    SizedBox(
-                      width: w * 0.07,
-                    ),
-                    Container(
-                      width: w * 0.28,
-                      height: h * 0.04,
-                      child: ElevatedButton(
-                        onPressed: () async {
-                          await FirebaseAuth.instance.verifyPhoneNumber(
-                            phoneNumber: '+66${PhoneController.text}',
-                            verificationCompleted:
-                                (PhoneAuthCredential credential) async {
-                              // Auto-retrieve the SMS code on Android devices.
-                              await FirebaseAuth.instance
-                                  .signInWithCredential(credential);
-                            },
-                            verificationFailed: (FirebaseAuthException e) {
-                              if (e.code == 'invalid-phone-number') {
-                                print(
-                                    'The provided phone number is not valid.');
-                              }
-                            },
-                            codeSent:
-                                (String verificationId, int? resendToken) {
-                              // Navigate to the second page to input OTP code.
-                            },
-                            codeAutoRetrievalTimeout:
-                                (String verificationId) {},
-                          );
-                        },
-                        child: Text(
-                          'Resend',
-                          style: TextStyle(
-                            color: Colors.white,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: Colors.red,
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(18),
-                          ),
-                        ),
+                textshowlogin(),
+                SizedBox(
+                  height: h * 0.1,
+                ),
+                Container(
+                  margin: EdgeInsets.only(
+                    left: w * 0.05,
+                    right: w * 0.03,
+                  ),
+                  child: Row(
+                    children: [
+                      otPinput(),
+                      SizedBox(
+                        width: w * 0.07,
                       ),
-                    )
-                  ],
-                ),
-              ),
-
-              /*Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  SizedBox(
-                    height: 68,
-                    width: 64,
-                    child: TextFormField(
-                      onChanged: ((value) {
-                        if (value.length == 1) {
-                          FocusScope.of(context).nextFocus();
-                        }
-                      }),
-                      style: Theme.of(context).textTheme.headline6,
-                      keyboardType: TextInputType.number,
-                      textAlign: TextAlign.center,
-                      inputFormatters: [
-                        LengthLimitingTextInputFormatter(1),
-                        FilteringTextInputFormatter.digitsOnly
-                      ],
-                    ),
-                  ),
-                  SizedBox(
-                    height: 68,
-                    width: 64,
-                    child: TextFormField(
-                      onChanged: ((value) {
-                        if (value.length == 1) {
-                          FocusScope.of(context).nextFocus();
-                        }
-                      }),
-                      style: Theme.of(context).textTheme.headline6,
-                      keyboardType: TextInputType.number,
-                      textAlign: TextAlign.center,
-                      inputFormatters: [
-                        LengthLimitingTextInputFormatter(1),
-                        FilteringTextInputFormatter.digitsOnly
-                      ],
-                    ),
-                  ),
-                  SizedBox(
-                    height: 68,
-                    width: 64,
-                    child: TextFormField(
-                      onChanged: ((value) {
-                        if (value.length == 1) {
-                          FocusScope.of(context).nextFocus();
-                        }
-                      }),
-                      style: Theme.of(context).textTheme.headline6,
-                      keyboardType: TextInputType.number,
-                      textAlign: TextAlign.center,
-                      inputFormatters: [
-                        LengthLimitingTextInputFormatter(1),
-                        FilteringTextInputFormatter.digitsOnly
-                      ],
-                    ),
-                  ),
-                  SizedBox(
-                    height: 68,
-                    width: 64,
-                    child: TextFormField(
-                      onChanged: ((value) {
-                        if (value.length == 1) {
-                          FocusScope.of(context).nextFocus();
-                        }
-                      }),
-                      style: Theme.of(context).textTheme.headline6,
-                      keyboardType: TextInputType.number,
-                      textAlign: TextAlign.center,
-                      inputFormatters: [
-                        LengthLimitingTextInputFormatter(1),
-                        FilteringTextInputFormatter.digitsOnly
-                      ],
-                    ),
-                  ),
-                ],
-              ),*/
-
-              SizedBox(
-                height: h * 0.12,
-              ),
-              Mutation(
-                  options: MutationOptions(
-                      document: gql(addUserMutation),
-                      variables: {
-                        'tel': PhoneController.text,
-                        'password': usedPassword.text,
-                        'confirmPassword': useConfirmPassword.text,
-                      }),
-                  builder: (RunMutation runMutation, QueryResult? result) {
-                    return Container(
-                      width: w * 0.8,
-                      height: h * 0.06,
-                      child: ElevatedButton(
-                        onPressed: (() async {
-                          try {
-                            final credential = PhoneAuthProvider.credential(
-                              verificationId: useVerificationId,
-                              smsCode: otpController.text,
+                      Container(
+                        width: w * 0.28,
+                        height: h * 0.04,
+                        child: ElevatedButton(
+                          onPressed: () async {
+                            await FirebaseAuth.instance.verifyPhoneNumber(
+                              phoneNumber: '+66${PhoneController.text}',
+                              verificationCompleted:
+                                  (PhoneAuthCredential credential) async {
+                                // Auto-retrieve the SMS code on Android devices.
+                                await FirebaseAuth.instance
+                                    .signInWithCredential(credential);
+                              },
+                              verificationFailed: (FirebaseAuthException e) {
+                                if (e.code == 'invalid-phone-number') {
+                                  print(
+                                      'The provided phone number is not valid.');
+                                }
+                              },
+                              codeSent:
+                                  (String verificationId, int? resendToken) {
+                                // Navigate to the second page to input OTP code.
+                              },
+                              codeAutoRetrievalTimeout:
+                                  (String verificationId) {},
                             );
-                            await FirebaseAuth.instance
-                                .signInWithCredential(credential);
-                            // Navigate to the home page.
-                            runMutation({});
-                            Navigator.pushReplacement(
-                                context,
-                                PageTransition(
-                                    child: bottomNavbar(
-                                      graphQLClient: passClient,
-                                    ),
-                                    type: PageTransitionType.rightToLeft));
-                          } on FirebaseAuthException catch (e) {
-                            if (e.code == 'invalid-verification-code') {
-                              // Display a notification for incorrect OTP code.
-                              ScaffoldMessenger.of(context).showSnackBar(
-                                SnackBar(
-                                  content: Text('OTP ไม่ถูกต้อง'),
-                                ),
-                              );
-                            }
-                          } catch (e) {
-                            print(e);
+                          },
+                          child: Text(
+                            'Resend',
+                            style: TextStyle(
+                              color: Colors.white,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: Colors.red,
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(18),
+                            ),
+                          ),
+                        ),
+                      )
+                    ],
+                  ),
+                ),
+
+                /*Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    SizedBox(
+                      height: 68,
+                      width: 64,
+                      child: TextFormField(
+                        onChanged: ((value) {
+                          if (value.length == 1) {
+                            FocusScope.of(context).nextFocus();
                           }
                         }),
-                        child: Text(
-                          'เสร็จสิ้น',
-                          style: TextStyle(
-                            fontSize: 16,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: Color.fromRGBO(9, 59, 158, 70),
-                          shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(18)),
-                        ),
+                        style: Theme.of(context).textTheme.headline6,
+                        keyboardType: TextInputType.number,
+                        textAlign: TextAlign.center,
+                        inputFormatters: [
+                          LengthLimitingTextInputFormatter(1),
+                          FilteringTextInputFormatter.digitsOnly
+                        ],
                       ),
-                    );
-                  }),
-              /*Container(
-                width: w * 0.8,
-                height: h * 0.06,
-                child: ElevatedButton(
-                  onPressed: (() async {
-                    try {
-                      final credential = PhoneAuthProvider.credential(
-                        verificationId: useVerificationId,
-                        smsCode: otpController.text,
-                      );
-                      await FirebaseAuth.instance
-                          .signInWithCredential(credential);
-                      // Navigate to the home page.
-                      _addUser(
-                        context,
-                        PhoneController.text.trim(),
-                        usedPassword.text.trim(),
-                        useConfirmPassword.text.trim(),
-                      );
-                      Navigator.pushReplacement(
-                          context,
-                          PageTransition(
-                              child: bottomNavbar(
-                                graphQLClient: passClient,
-                              ),
-                              type: PageTransitionType.rightToLeft));
-                    } on FirebaseAuthException catch (e) {
-                      if (e.code == 'invalid-verification-code') {
-                        // Display a notification for incorrect OTP code.
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          SnackBar(
-                            content: Text('OTP ไม่ถูกต้อง'),
+                    ),
+                    SizedBox(
+                      height: 68,
+                      width: 64,
+                      child: TextFormField(
+                        onChanged: ((value) {
+                          if (value.length == 1) {
+                            FocusScope.of(context).nextFocus();
+                          }
+                        }),
+                        style: Theme.of(context).textTheme.headline6,
+                        keyboardType: TextInputType.number,
+                        textAlign: TextAlign.center,
+                        inputFormatters: [
+                          LengthLimitingTextInputFormatter(1),
+                          FilteringTextInputFormatter.digitsOnly
+                        ],
+                      ),
+                    ),
+                    SizedBox(
+                      height: 68,
+                      width: 64,
+                      child: TextFormField(
+                        onChanged: ((value) {
+                          if (value.length == 1) {
+                            FocusScope.of(context).nextFocus();
+                          }
+                        }),
+                        style: Theme.of(context).textTheme.headline6,
+                        keyboardType: TextInputType.number,
+                        textAlign: TextAlign.center,
+                        inputFormatters: [
+                          LengthLimitingTextInputFormatter(1),
+                          FilteringTextInputFormatter.digitsOnly
+                        ],
+                      ),
+                    ),
+                    SizedBox(
+                      height: 68,
+                      width: 64,
+                      child: TextFormField(
+                        onChanged: ((value) {
+                          if (value.length == 1) {
+                            FocusScope.of(context).nextFocus();
+                          }
+                        }),
+                        style: Theme.of(context).textTheme.headline6,
+                        keyboardType: TextInputType.number,
+                        textAlign: TextAlign.center,
+                        inputFormatters: [
+                          LengthLimitingTextInputFormatter(1),
+                          FilteringTextInputFormatter.digitsOnly
+                        ],
+                      ),
+                    ),
+                  ],
+                ),*/
+
+                SizedBox(
+                  height: h * 0.12,
+                ),
+                Mutation(
+                    options: MutationOptions(
+                      document: gql(addUserMutation),
+                    ),
+                    builder: (RunMutation runMutation, QueryResult? result) {
+                      return Container(
+                        width: w * 0.8,
+                        height: h * 0.06,
+                        child: ElevatedButton(
+                          onPressed: (() async {
+                            try {
+                              final credential = PhoneAuthProvider.credential(
+                                verificationId: useVerificationId,
+                                smsCode: otpController.text,
+                              );
+                              await FirebaseAuth.instance
+                                  .signInWithCredential(credential);
+                              // Navigate to the home page.
+                              runMutation({
+                                'tel': PhoneController.text,
+                                'password': usedPassword.text,
+                                'confirmPassword': useConfirmPassword.text,
+                              });
+                              Navigator.pushReplacement(
+                                  context,
+                                  PageTransition(
+                                      child: loginpage(
+                                        graphQLClient: passClient,
+                                      ),
+                                      type: PageTransitionType.rightToLeft));
+                            } on FirebaseAuthException catch (e) {
+                              if (e.code == 'invalid-verification-code') {
+                                // Display a notification for incorrect OTP code.
+                                ScaffoldMessenger.of(context).showSnackBar(
+                                  SnackBar(
+                                    content: Text('OTP ไม่ถูกต้อง'),
+                                  ),
+                                );
+                              }
+                            } catch (e) {
+                              print(e);
+                            }
+                          }),
+                          child: Text(
+                            'เสร็จสิ้น',
+                            style: TextStyle(
+                              fontSize: 16,
+                              fontWeight: FontWeight.bold,
+                            ),
                           ),
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: Color.fromRGBO(9, 59, 158, 70),
+                            shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(18)),
+                          ),
+                        ),
+                      );
+                    }),
+                /*Container(
+                  width: w * 0.8,
+                  height: h * 0.06,
+                  child: ElevatedButton(
+                    onPressed: (() async {
+                      try {
+                        final credential = PhoneAuthProvider.credential(
+                          verificationId: useVerificationId,
+                          smsCode: otpController.text,
                         );
+                        await FirebaseAuth.instance
+                            .signInWithCredential(credential);
+                        // Navigate to the home page.
+                        _addUser(
+                          context,
+                          PhoneController.text.trim(),
+                          usedPassword.text.trim(),
+                          useConfirmPassword.text.trim(),
+                        );
+                        Navigator.pushReplacement(
+                            context,
+                            PageTransition(
+                                child: bottomNavbar(
+                                  graphQLClient: passClient,
+                                ),
+                                type: PageTransitionType.rightToLeft));
+                      } on FirebaseAuthException catch (e) {
+                        if (e.code == 'invalid-verification-code') {
+                          // Display a notification for incorrect OTP code.
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            SnackBar(
+                              content: Text('OTP ไม่ถูกต้อง'),
+                            ),
+                          );
+                        }
+                      } catch (e) {
+                        print(e);
                       }
-                    } catch (e) {
-                      print(e);
-                    }
-                  }),
-                  child: Text(
-                    'เสร็จสิ้น',
-                    style: TextStyle(
-                      fontSize: 16,
-                      fontWeight: FontWeight.bold,
+                    }),
+                    child: Text(
+                      'เสร็จสิ้น',
+                      style: TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Color.fromRGBO(9, 59, 158, 70),
+                      shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(18)),
                     ),
                   ),
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: Color.fromRGBO(9, 59, 158, 70),
-                    shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(18)),
-                  ),
+                ),*/
+                SizedBox(
+                  height: h * 0.04,
                 ),
-              ),*/
-              SizedBox(
-                height: h * 0.04,
-              ),
-              textandbutton(),
-            ],
+                textandbutton(),
+              ],
+            ),
           ),
         ),
       ),

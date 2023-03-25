@@ -9,10 +9,15 @@ import 'package:trendy_mobile_1/homepage/register/register.dart';
 import 'package:trendy_mobile_1/homepage/size_helper.dart';
 
 class fgotpinput extends StatelessWidget {
-  const fgotpinput(
-      {super.key, required this.graphQLClient, required this.verificationId});
+  const fgotpinput({
+    super.key,
+    required this.graphQLClient,
+    required this.verificationId,
+    required this.PhoneController,
+  });
   final ValueNotifier<GraphQLClient> graphQLClient;
   final String verificationId;
+  final TextEditingController PhoneController;
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
@@ -24,6 +29,7 @@ class fgotpinput extends StatelessWidget {
         title: 'Flutter Demo Home Page',
         passClient: graphQLClient,
         passVerification: verificationId,
+        passPhControl: PhoneController,
       ),
     );
   }
@@ -34,22 +40,26 @@ class fgotpPage extends StatefulWidget {
       {super.key,
       required this.title,
       required this.passClient,
-      required this.passVerification});
+      required this.passVerification,
+      required this.passPhControl});
   final ValueNotifier<GraphQLClient> passClient;
   final String title;
   final String passVerification;
+  final TextEditingController passPhControl;
   @override
   State<fgotpPage> createState() => _fgotpPageState(
         usedClient: passClient,
         usedVerification: passVerification,
+        UsedPhoneControl: passPhControl,
       );
 }
 
 class _fgotpPageState extends State<fgotpPage> {
-  _fgotpPageState({
-    required this.usedClient,
-    required this.usedVerification,
-  });
+  _fgotpPageState(
+      {required this.usedClient,
+      required this.usedVerification,
+      required this.UsedPhoneControl});
+  final TextEditingController UsedPhoneControl;
   final ValueNotifier<GraphQLClient> usedClient;
   final String usedVerification;
   TextEditingController otpController = TextEditingController();
@@ -208,6 +218,7 @@ class _fgotpPageState extends State<fgotpPage> {
                           PageTransition(
                               child: fgresetPassword(
                                 graphQLClient: usedClient,
+                                PhoneController: UsedPhoneControl,
                               ),
                               type: PageTransitionType.rightToLeft));
                     } on FirebaseAuthException catch (e) {
