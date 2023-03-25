@@ -36,22 +36,9 @@ class logPage extends StatefulWidget {
 
 class _logPageState extends State<logPage> {
   _logPageState({required this.passClient});
+  final _formKey = GlobalKey<FormState>();
   final ValueNotifier<GraphQLClient> passClient;
-  TextFormField _textphone = new TextFormField(
-    validator: (value) {
-      if (value == null || value.isEmpty) {
-        return 'กรุณาเบอร์โทรศัพท์';
-      } else {
-        return null;
-      }
-    },
-    decoration: InputDecoration(
-      contentPadding: EdgeInsets.all(10),
-      border: InputBorder.none,
-    ),
-    keyboardType: TextInputType.phone,
-    autocorrect: false,
-  );
+  TextEditingController PhoneLoginController = TextEditingController();
 
   Widget phoneinput() {
     double w = displayWidth(context);
@@ -61,7 +48,22 @@ class _logPageState extends State<logPage> {
           color: Color.fromARGB(255, 240, 240, 240),
           border: Border.all(width: 1.2, color: Colors.cyanAccent),
           borderRadius: BorderRadius.all(Radius.circular(18))),
-      child: _textphone,
+      child: TextFormField(
+        validator: (value) {
+          if (value == null || value.isEmpty) {
+            return 'กรุณาเบอร์โทรศัพท์';
+          } else {
+            return null;
+          }
+        },
+        decoration: InputDecoration(
+          contentPadding: EdgeInsets.all(10),
+          border: InputBorder.none,
+        ),
+        keyboardType: TextInputType.phone,
+        autocorrect: false,
+        controller: PhoneLoginController,
+      ),
     );
   }
 
@@ -209,58 +211,73 @@ class _logPageState extends State<logPage> {
     double h = displayHeight(context);
     return SafeArea(
       child: Scaffold(
-        body: Center(
-          child: Column(
-            //mainAxisAlignment: MainAxisAlignment.center,
-            children: <Widget>[
-              showlogo(),
-              SizedBox(
-                height: h * 0.02,
-              ),
-              textshowlogin(),
-              SizedBox(
-                height: h * 0.1,
-              ),
-              phoneinput(),
-              SizedBox(
-                height: h * 0.1,
-              ),
-              Container(
-                width: w * 0.8,
-                height: h * 0.06,
-                child: ElevatedButton(
-                  onPressed: (() {
-                    Navigator.push(
-                        context,
-                        PageTransition(
-                            child: loginpage2(
-                              graphQLClient: passClient,
+        body: Form(
+          key: _formKey,
+          child: Center(
+            child: Column(
+              //mainAxisAlignment: MainAxisAlignment.center,
+              children: <Widget>[
+                showlogo(),
+                SizedBox(
+                  height: h * 0.02,
+                ),
+                textshowlogin(),
+                SizedBox(
+                  height: h * 0.1,
+                ),
+                phoneinput(),
+                SizedBox(
+                  height: h * 0.1,
+                ),
+                Container(
+                  width: w * 0.8,
+                  height: h * 0.06,
+                  child: ElevatedButton(
+                    onPressed: (() {
+                      if (_formKey.currentState!.validate()) {
+                        if (PhoneLoginController.text.trim().isEmpty) {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            SnackBar(
+                              content: Text('โปรดใส่เบอร์โทรศัพท์ของคุณ'),
+                              duration: Duration(seconds: 2),
                             ),
-                            type: PageTransitionType.rightToLeft));
-                  }),
-                  child: Text(
-                    'ถัดไป',
-                    style: TextStyle(
-                      fontFamily: 'LineseedsanBd',
-                      fontSize: 16,
+                          );
+                        } else {
+                          Navigator.push(
+                              context,
+                              PageTransition(
+                                  child: loginpage2(
+                                    graphQLClient: passClient,
+                                    phoneControl: PhoneLoginController,
+                                  ),
+                                  type: PageTransitionType.rightToLeft));
+                        }
+                      }
+                    }),
+                    child: Text(
+                      'ถัดไป',
+                      style: TextStyle(
+                        fontFamily: 'LineseedsanBd',
+                        fontSize: 16,
+                      ),
+                    ),
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Color.fromRGBO(9, 59, 158, 70),
+                      shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(18)),
                     ),
                   ),
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: Color.fromRGBO(9, 59, 158, 70),
-                    shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(18)),
-                  ),
                 ),
-              ),
-              SizedBox(
-                height: h * 0.04,
-              ),
-              textandbutton(),
-              SizedBox(
-                height: h * 0.001,
-              ),
-              forgotandbutton()
-            ],
+                SizedBox(
+                  height: h * 0.04,
+                ),
+                textandbutton(),
+                SizedBox(
+                  height: h * 0.001,
+                ),
+                forgotandbutton()
+              ],
+            ),
           ),
         ),
       ),

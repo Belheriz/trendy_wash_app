@@ -6,6 +6,34 @@ import 'package:trendy_mobile_1/graphql/graphql_service.dart';
 import 'package:trendy_mobile_1/homepage/wash/washlauandry.dart';
 import 'package:trendy_mobile_1/locationService/location_service.dart';
 import 'washModel.dart';
+import 'dart:io';
+
+final HttpLink httpLink = HttpLink(
+  'https://api.graphql.trendywash.net/',
+);
+final AuthLink authLink = AuthLink(
+  getToken: () async =>
+      'Bearer <eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY0MDZkMjM0ZTM5MTJmZTgwZDEyODQ3MCIsImlhdCI6MTY3ODIxODk5OSwiZXhwIjoxNjc4MzA1Mzk5fQ.NF9ovfe--0-DlTTkGW4mFORI1YTDSDWOK7cXDLzZSWo>',
+);
+
+final Link link = authLink.concat(httpLink);
+
+ValueNotifier<GraphQLClient> client = ValueNotifier(
+  GraphQLClient(
+    link: link,
+    cache: GraphQLCache(),
+  ),
+);
+
+class MyHttpOverrides extends HttpOverrides {
+  @override
+  HttpClient createHttpClient(SecurityContext? context) {
+    HttpClient client = super.createHttpClient(context);
+    client.badCertificateCallback =
+        (X509Certificate cert, String host, int port) => true;
+    return client;
+  }
+}
 
 class wash extends StatelessWidget {
   const wash({super.key, required this.graphQLClient});
@@ -29,14 +57,18 @@ class wash extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'Flutter Demo',
-      theme: ThemeData(
-        primarySwatch: white,
-        fontFamily: 'LineseedsanRg',
-      ),
-      home: Washmainpage(
-        client: graphQLClient,
+    HttpOverrides.global = new MyHttpOverrides();
+    return GraphQLProvider(
+      client: client,
+      child: MaterialApp(
+        title: 'Flutter Demo',
+        theme: ThemeData(
+          primarySwatch: white,
+          fontFamily: 'LineseedsanRg',
+        ),
+        home: Washmainpage(
+          client: graphQLClient,
+        ),
       ),
     );
   }

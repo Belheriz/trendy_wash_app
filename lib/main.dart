@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:graphql_flutter/graphql_flutter.dart';
 import 'package:page_transition/page_transition.dart';
+import 'package:provider/provider.dart';
 import 'package:trendy_mobile_1/homepage/login/loginpage.dart';
 import 'package:trendy_mobile_1/homepage/register/register.dart';
 import 'package:trendy_mobile_1/homepage/size_helper.dart';
@@ -237,38 +238,6 @@ class MyApp extends StatelessWidget {
                       ),
                       const SizedBox(
                         height: 40,
-                      ),
-                      Container(
-                        width: w * 0.7,
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            Container(
-                              //margin: EdgeInsets.only(right: 40),
-                              child: Column(
-                                children: [
-                                  Image.asset('assets/images/facebook.png')
-                                ],
-                              ),
-                            ),
-                            Container(
-                              //margin: EdgeInsets.only(right: 50),
-                              child: IconButton(
-                                onPressed: (() {}),
-                                icon: SvgPicture.asset(
-                                    'assets/svgassets/line.svg'),
-                              ),
-                            ),
-                            Container(
-                              // margin: EdgeInsets.only(left: 10),
-                              child: IconButton(
-                                onPressed: (() {}),
-                                icon: SvgPicture.asset(
-                                    'assets/svgassets/google.svg'),
-                              ),
-                            ),
-                          ],
-                        ),
                       ),
                       SizedBox(
                         height: h * 0.01,
