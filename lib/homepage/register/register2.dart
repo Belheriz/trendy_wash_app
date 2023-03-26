@@ -10,12 +10,9 @@ import 'package:trendy_mobile_1/homepage/size_helper.dart';
 
 class registerpage2 extends StatelessWidget {
   const registerpage2(
-      {super.key,
-      required this.graphQLClient,
-      required this.verificationId,
-      required this.passPhoneControl});
+      {super.key, required this.graphQLClient, required this.passPhoneControl});
   final ValueNotifier<GraphQLClient> graphQLClient;
-  final String verificationId;
+
   final TextEditingController passPhoneControl;
   @override
   Widget build(BuildContext context) {
@@ -28,7 +25,6 @@ class registerpage2 extends StatelessWidget {
       home: regis2Page(
         title: 'Flutter Demo Home Page',
         client: graphQLClient,
-        verification: verificationId,
         passcontrol: passPhoneControl,
       ),
     );
@@ -40,9 +36,8 @@ class regis2Page extends StatefulWidget {
       {super.key,
       required this.title,
       required this.client,
-      required this.verification,
       required this.passcontrol});
-  final String verification;
+
   final ValueNotifier<GraphQLClient> client;
   final String title;
   final TextEditingController passcontrol;
@@ -50,21 +45,62 @@ class regis2Page extends StatefulWidget {
   @override
   State<regis2Page> createState() => _regis2PageState(
         passClient: client,
-        passVerifacation: verification,
         phoneController: passcontrol,
       );
 }
 
 class _regis2PageState extends State<regis2Page> {
-  _regis2PageState(
-      {required this.passClient,
-      required this.passVerifacation,
-      required this.phoneController});
-  final String passVerifacation;
+  _regis2PageState({required this.passClient, required this.phoneController});
+
   final ValueNotifier<GraphQLClient> passClient;
   final TextEditingController phoneController;
   TextEditingController passwordController = TextEditingController();
   final _formKey = GlobalKey<FormState>();
+  TextEditingController ConfirmpasswordController = TextEditingController();
+
+  String addUserMutation = '''
+  mutation addUser(
+    \$tel: String!
+    \$password: String!
+    \$confirmPassword: String!
+    
+  ) {
+    addUser(
+      tel: \$tel
+      password: \$password
+      confirmPassword: \$confirmPassword
+      )
+     
+  }
+''';
+
+  Widget confirmpasswordinput() {
+    double w = displayWidth(context);
+    return Container(
+      margin: EdgeInsets.only(left: w * 0.05, right: w * 0.05),
+      decoration: BoxDecoration(
+          color: Color.fromARGB(255, 240, 240, 240),
+          border: Border.all(width: 1.2, color: Colors.cyanAccent),
+          borderRadius: BorderRadius.all(Radius.circular(18))),
+      child: TextFormField(
+        validator: (value) {
+          if (value == null || value.isEmpty) {
+            return 'กรุณาตั้งรหัสผ่าน';
+          } else {
+            return null;
+          }
+        },
+        decoration: InputDecoration(
+          contentPadding: EdgeInsets.all(10),
+          border: InputBorder.none,
+          hintText: 'กรุณาใส่รหัสผ่านของคุณอีกครั้ง',
+        ),
+        keyboardType: TextInputType.text,
+        autocorrect: false,
+        controller: ConfirmpasswordController,
+      ),
+    );
+  }
 
   Widget passwordinput() {
     double w = displayWidth(context);
@@ -83,7 +119,10 @@ class _regis2PageState extends State<regis2Page> {
           }
         },
         decoration: InputDecoration(
-            contentPadding: EdgeInsets.all(10), border: InputBorder.none),
+          contentPadding: EdgeInsets.all(10),
+          border: InputBorder.none,
+          hintText: 'กรุณาใส่รหัสผ่านของคุณ',
+        ),
         keyboardType: TextInputType.text,
         autocorrect: false,
         controller: passwordController,
@@ -192,48 +231,58 @@ class _regis2PageState extends State<regis2Page> {
                   height: h * 0.1,
                 ),
                 passwordinput(),
+                confirmpasswordinput(),
                 SizedBox(
                   height: h * 0.12,
                 ),
-                Container(
-                  width: w * 0.8,
-                  height: h * 0.06,
-                  child: ElevatedButton(
-                    onPressed: (() {
-                      if (_formKey.currentState!.validate()) {
-                        if (passwordController.text.trim().isEmpty) {
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            SnackBar(
-                              content: Text('โปรดใส่รหัสผ่านของคุณ'),
-                              duration: Duration(seconds: 2),
-                            ),
-                          );
-                        } else {
-                          Navigator.pushReplacement(
-                              context,
-                              PageTransition(
-                                  child: registerConfirmPasspage(
-                                    graphQLClient: passClient,
-                                    verificationId: passVerifacation,
-                                    passPhoneControl: phoneController,
-                                    passwordControl: passwordController,
+                Mutation(
+                    options: MutationOptions(document: gql(addUserMutation)),
+                    builder: (RunMutation runMutation, QueryResult? result) {
+                      return Container(
+                        width: w * 0.8,
+                        height: h * 0.06,
+                        child: ElevatedButton(
+                          onPressed: (() {
+                            if (_formKey.currentState!.validate()) {
+                              if (passwordController.text.trim().isEmpty) {
+                                ScaffoldMessenger.of(context).showSnackBar(
+                                  SnackBar(
+                                    content: Text('โปรดใส่รหัสผ่านของคุณ'),
+                                    duration: Duration(seconds: 2),
                                   ),
-                                  type: PageTransitionType.rightToLeft));
-                        }
-                      }
+                                );
+                              } else {
+                                runMutation({
+                                  'tel': phoneController.text,
+                                  'password': passwordController.text,
+                                  'confirmPassword':
+                                      ConfirmpasswordController.text,
+                                });
+                                Navigator.pushReplacement(
+                                    context,
+                                    PageTransition(
+                                        child: registerConfirmPasspage(
+                                          graphQLClient: passClient,
+                                          passPhoneControl: phoneController,
+                                          passwordControl: passwordController,
+                                        ),
+                                        type: PageTransitionType.rightToLeft));
+                              }
+                            }
+                          }),
+                          child: Text(
+                            'ถัดไป',
+                            style: TextStyle(
+                                fontWeight: FontWeight.bold, fontSize: 16),
+                          ),
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: Color.fromRGBO(9, 59, 158, 70),
+                            shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(18)),
+                          ),
+                        ),
+                      );
                     }),
-                    child: Text(
-                      'ถัดไป',
-                      style:
-                          TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
-                    ),
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: Color.fromRGBO(9, 59, 158, 70),
-                      shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(18)),
-                    ),
-                  ),
-                ),
                 SizedBox(
                   height: 20,
                 ),

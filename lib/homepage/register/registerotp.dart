@@ -10,6 +10,7 @@ import 'package:page_transition/page_transition.dart';
 import 'package:trendy_mobile_1/homepage/bottomNavbar.dart';
 import 'package:trendy_mobile_1/homepage/homepage.dart';
 import 'package:trendy_mobile_1/homepage/login/loginpage.dart';
+import 'package:trendy_mobile_1/homepage/register/register2.dart';
 import 'package:trendy_mobile_1/homepage/size_helper.dart';
 
 final HttpLink httpLinkUser = HttpLink(
@@ -30,14 +31,11 @@ class registerpageotp extends StatelessWidget {
     required this.graphQLClient,
     required this.verificationId,
     required this.passPhController,
-    required this.passwordControl,
-    required this.confirmpasswordControl,
   });
   final ValueNotifier<GraphQLClient> graphQLClient;
   final String verificationId;
   final TextEditingController passPhController;
-  final TextEditingController passwordControl;
-  final TextEditingController confirmpasswordControl;
+
   @override
   Widget build(BuildContext context) {
     return GraphQLProvider(
@@ -53,8 +51,6 @@ class registerpageotp extends StatelessWidget {
           client: graphQLClient,
           passVerification: verificationId,
           passPh: passPhController,
-          Password: passwordControl,
-          ConfirmPassword: confirmpasswordControl,
         ),
       ),
     );
@@ -68,23 +64,17 @@ class regisOtpPage extends StatefulWidget {
     required this.client,
     required this.passVerification,
     required this.passPh,
-    required this.Password,
-    required this.ConfirmPassword,
   });
   final ValueNotifier<GraphQLClient> client;
   final String title;
   final String passVerification;
   final TextEditingController passPh;
-  final TextEditingController Password;
-  final TextEditingController ConfirmPassword;
 
   @override
   State<regisOtpPage> createState() => _RegisOtpPageState(
         passClient: client,
         useVerificationId: passVerification,
         PhoneController: passPh,
-        useConfirmPassword: ConfirmPassword,
-        usedPassword: Password,
       );
 }
 
@@ -95,8 +85,6 @@ class _RegisOtpPageState extends State<regisOtpPage> {
     required this.passClient,
     required this.useVerificationId,
     required this.PhoneController,
-    required this.usedPassword,
-    required this.useConfirmPassword,
   });
 
   //
@@ -122,8 +110,6 @@ class _RegisOtpPageState extends State<regisOtpPage> {
   }
 ''';
 
-  final TextEditingController usedPassword;
-  final TextEditingController useConfirmPassword;
   final TextEditingController PhoneController;
   final String useVerificationId;
   final ValueNotifier<GraphQLClient> passClient;
@@ -426,64 +412,55 @@ class _RegisOtpPageState extends State<regisOtpPage> {
                 SizedBox(
                   height: h * 0.12,
                 ),
-                Mutation(
-                    options: MutationOptions(
-                      document: gql(addUserMutation),
-                    ),
-                    builder: (RunMutation runMutation, QueryResult? result) {
-                      return Container(
-                        width: w * 0.8,
-                        height: h * 0.06,
-                        child: ElevatedButton(
-                          onPressed: (() async {
-                            try {
-                              final credential = PhoneAuthProvider.credential(
-                                verificationId: useVerificationId,
-                                smsCode: otpController.text,
-                              );
-                              await FirebaseAuth.instance
-                                  .signInWithCredential(credential);
-                              // Navigate to the home page.
-                              runMutation({
-                                'tel': PhoneController.text,
-                                'password': usedPassword.text,
-                                'confirmPassword': useConfirmPassword.text,
-                              });
-                              Navigator.pushReplacement(
-                                  context,
-                                  PageTransition(
-                                      child: loginpage(
-                                        graphQLClient: passClient,
-                                      ),
-                                      type: PageTransitionType.rightToLeft));
-                            } on FirebaseAuthException catch (e) {
-                              if (e.code == 'invalid-verification-code') {
-                                // Display a notification for incorrect OTP code.
-                                ScaffoldMessenger.of(context).showSnackBar(
-                                  SnackBar(
-                                    content: Text('OTP ไม่ถูกต้อง'),
-                                  ),
-                                );
-                              }
-                            } catch (e) {
-                              print(e);
-                            }
-                          }),
-                          child: Text(
-                            'เสร็จสิ้น',
-                            style: TextStyle(
-                              fontSize: 16,
-                              fontWeight: FontWeight.bold,
+                Container(
+                  width: w * 0.8,
+                  height: h * 0.06,
+                  child: ElevatedButton(
+                    onPressed: (() async {
+                      try {
+                        final credential = PhoneAuthProvider.credential(
+                          verificationId: useVerificationId,
+                          smsCode: otpController.text,
+                        );
+                        await FirebaseAuth.instance
+                            .signInWithCredential(credential);
+                        // Navigate to the home page.
+
+                        Navigator.pushReplacement(
+                            context,
+                            PageTransition(
+                                child: registerpage2(
+                                  graphQLClient: passClient,
+                                  passPhoneControl: PhoneController,
+                                ),
+                                type: PageTransitionType.rightToLeft));
+                      } on FirebaseAuthException catch (e) {
+                        if (e.code == 'invalid-verification-code') {
+                          // Display a notification for incorrect OTP code.
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            SnackBar(
+                              content: Text('OTP ไม่ถูกต้อง'),
                             ),
-                          ),
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor: Color.fromRGBO(9, 59, 158, 70),
-                            shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(18)),
-                          ),
-                        ),
-                      );
+                          );
+                        }
+                      } catch (e) {
+                        print(e);
+                      }
                     }),
+                    child: Text(
+                      'เสร็จสิ้น',
+                      style: TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Color.fromRGBO(9, 59, 158, 70),
+                      shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(18)),
+                    ),
+                  ),
+                ),
                 /*Container(
                   width: w * 0.8,
                   height: h * 0.06,

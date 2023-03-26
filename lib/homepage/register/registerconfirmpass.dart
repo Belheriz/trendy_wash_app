@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:graphql_flutter/graphql_flutter.dart';
 
 import 'package:page_transition/page_transition.dart';
+import 'package:trendy_mobile_1/homepage/bottomNavbar.dart';
 import 'package:trendy_mobile_1/homepage/homepage.dart';
 import 'package:trendy_mobile_1/homepage/login/loginpage.dart';
 import 'package:trendy_mobile_1/homepage/register/registerotp.dart';
@@ -11,11 +12,10 @@ class registerConfirmPasspage extends StatelessWidget {
   const registerConfirmPasspage(
       {super.key,
       required this.graphQLClient,
-      required this.verificationId,
       required this.passPhoneControl,
       required this.passwordControl});
   final ValueNotifier<GraphQLClient> graphQLClient;
-  final String verificationId;
+
   final TextEditingController passPhoneControl;
   final TextEditingController passwordControl;
   @override
@@ -29,7 +29,6 @@ class registerConfirmPasspage extends StatelessWidget {
       home: regisConfirmPassPage(
         title: 'Flutter Demo Home Page',
         client: graphQLClient,
-        verification: verificationId,
         passcontrol: passPhoneControl,
         Password: passwordControl,
       ),
@@ -42,10 +41,9 @@ class regisConfirmPassPage extends StatefulWidget {
       {super.key,
       required this.title,
       required this.client,
-      required this.verification,
       required this.passcontrol,
       required this.Password});
-  final String verification;
+
   final ValueNotifier<GraphQLClient> client;
   final String title;
   final TextEditingController passcontrol;
@@ -54,7 +52,6 @@ class regisConfirmPassPage extends StatefulWidget {
   @override
   State<regisConfirmPassPage> createState() => _regisConfirmPassPageState(
         passClient: client,
-        passVerifacation: verification,
         phoneController: passcontrol,
         usedPassword: Password,
       );
@@ -63,17 +60,16 @@ class regisConfirmPassPage extends StatefulWidget {
 class _regisConfirmPassPageState extends State<regisConfirmPassPage> {
   _regisConfirmPassPageState(
       {required this.passClient,
-      required this.passVerifacation,
       required this.phoneController,
       required this.usedPassword});
-  final String passVerifacation;
+
   final ValueNotifier<GraphQLClient> passClient;
   final TextEditingController phoneController;
   final TextEditingController usedPassword;
   TextEditingController ConfirmpasswordController = TextEditingController();
   final _formKey = GlobalKey<FormState>();
 
-  Widget passwordinput() {
+  Widget confirmpasswordinput() {
     double w = displayWidth(context);
     return Container(
       margin: EdgeInsets.only(left: w * 0.05, right: w * 0.05),
@@ -198,7 +194,7 @@ class _regisConfirmPassPageState extends State<regisConfirmPassPage> {
                 SizedBox(
                   height: h * 0.1,
                 ),
-                passwordinput(),
+                // passwordinput(),
                 SizedBox(
                   height: h * 0.12,
                 ),
@@ -227,13 +223,8 @@ class _regisConfirmPassPageState extends State<regisConfirmPassPage> {
                           Navigator.pushReplacement(
                               context,
                               PageTransition(
-                                  child: registerpageotp(
+                                  child: bottomNavbar(
                                     graphQLClient: passClient,
-                                    verificationId: passVerifacation,
-                                    passPhController: phoneController,
-                                    passwordControl: usedPassword,
-                                    confirmpasswordControl:
-                                        ConfirmpasswordController,
                                   ),
                                   type: PageTransitionType.rightToLeft));
                         }

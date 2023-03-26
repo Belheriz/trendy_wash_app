@@ -270,11 +270,32 @@ class _fgconfirmPassPageState extends State<fgconfirmPassPage> {
                       height: h * 0.06,
                       child: ElevatedButton(
                         onPressed: (() {
-                          runMutation({
-                            'tel': UsedPhoneController.text,
-                            'password': UsedresetPasswordController.text,
-                            'confirmPassword': confirmpasswordControl.text,
-                          });
+                          if (_formKey.currentState!.validate()) {
+                            if (UsedresetPasswordController.text !=
+                                confirmpasswordControl.text) {
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                SnackBar(
+                                  content: Text('รหัสผ่านของท่านไม่ตรงกัน'),
+                                  duration: Duration(seconds: 10),
+                                ),
+                              );
+                            } else if (confirmpasswordControl.text
+                                .trim()
+                                .isEmpty) {
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                SnackBar(
+                                  content: Text('โปรดใส่รหัสผ่านของท่าน'),
+                                  duration: Duration(seconds: 2),
+                                ),
+                              );
+                            } else {
+                              runMutation({
+                                'tel': UsedPhoneController.text,
+                                'password': UsedresetPasswordController.text,
+                                'confirmPassword': confirmpasswordControl.text,
+                              });
+                            }
+                          }
                         }),
                         child: Text(
                           'ถัดไป',
