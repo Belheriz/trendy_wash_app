@@ -207,77 +207,79 @@ query getMachineBySite( \$siteId: ID! ){
         ),
       );
     } else {
+      print(startDeviceMutation);
       showDialog(
         context: context,
         builder: (BuildContext context) {
           return AlertDialog(
-              insetPadding: EdgeInsets.zero,
-              content: Column(
-                children: [
-                  Image.asset('assets/images/laundrycomplete.png'),
-                  SizedBox(
-                    height: 20,
+            insetPadding: EdgeInsets.zero,
+            content: Column(
+              children: [
+                Image.asset('assets/images/laundrycomplete.png'),
+                SizedBox(
+                  height: 20,
+                ),
+                Center(
+                  child: Text(
+                    'คำสั่งซักผ้าสำเร็จ',
+                    style: TextStyle(
+                        color: Colors.black,
+                        fontSize: 20,
+                        fontWeight: FontWeight.bold),
                   ),
-                  Center(
+                ),
+                SizedBox(
+                  height: 60,
+                ),
+                Container(
+                  height: 40,
+                  width: 180,
+                  child: ElevatedButton(
                     child: Text(
-                      'คำสั่งซักผ้าสำเร็จ',
+                      'ดูการเติมเงิน',
                       style: TextStyle(
-                          color: Colors.black,
-                          fontSize: 20,
+                        color: Colors.white,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                    onPressed: () {},
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Color(0xff093B9E),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.all(
+                          Radius.circular(14),
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+                SizedBox(
+                  height: 15,
+                ),
+                Container(
+                  height: 40,
+                  width: 180,
+                  child: ElevatedButton(
+                    child: Text(
+                      'กลับหน้าหลัก',
+                      style: TextStyle(
+                          color: Color(0xff00BBA9),
                           fontWeight: FontWeight.bold),
                     ),
-                  ),
-                  SizedBox(
-                    height: 60,
-                  ),
-                  Container(
-                    height: 40,
-                    width: 180,
-                    child: ElevatedButton(
-                      child: Text(
-                        'ดูการเติมเงิน',
-                        style: TextStyle(
-                          color: Colors.white,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                      onPressed: () {},
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: Color(0xff093B9E),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.all(
-                            Radius.circular(14),
-                          ),
+                    onPressed: () {},
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Color(0xffD9F5F2),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.all(
+                          Radius.circular(14),
                         ),
                       ),
                     ),
                   ),
-                  SizedBox(
-                    height: 15,
-                  ),
-                  Container(
-                    height: 40,
-                    width: 180,
-                    child: ElevatedButton(
-                      child: Text(
-                        'กลับหน้าหลัก',
-                        style: TextStyle(
-                            color: Color(0xff00BBA9),
-                            fontWeight: FontWeight.bold),
-                      ),
-                      onPressed: () {},
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: Color(0xffD9F5F2),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.all(
-                            Radius.circular(14),
-                          ),
-                        ),
-                      ),
-                    ),
-                  ),
-                ],
-              ));
+                ),
+              ],
+            ),
+          );
         },
       );
     }
@@ -487,6 +489,7 @@ query getMachineBySite( \$siteId: ID! ){
               if (machines == null) {
                 return const Text('No repositories');
               }
+              print(readRepositories);
 
               return SingleChildScrollView(
                 child: Column(
@@ -520,6 +523,9 @@ query getMachineBySite( \$siteId: ID! ){
                             duration.inHours.toString() + ' hour';*/
                         print(keeptime);
                         print('seconds:$seconds');
+                        print(washer?['machine_group'] ?? "");
+                        print(washer?["machine_name"] ?? "");
+
                         /*if (duration.inHours > 1) {
                           formattedTime += 's';
                         }*/

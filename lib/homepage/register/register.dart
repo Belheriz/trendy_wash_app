@@ -8,6 +8,7 @@ import 'package:trendy_mobile_1/homepage/login/loginpage.dart';
 
 import 'package:trendy_mobile_1/homepage/register/register.dart';
 import 'package:trendy_mobile_1/homepage/register/register2.dart';
+import 'package:trendy_mobile_1/homepage/register/registerotp.dart';
 import 'package:trendy_mobile_1/homepage/size_helper.dart';
 
 class registerpage extends StatelessWidget {
@@ -241,10 +242,10 @@ class _regisPageState extends State<regisPage> {
                               Navigator.pushReplacement(
                                   context,
                                   PageTransition(
-                                      child: registerpage2(
+                                      child: registerpageotp(
                                         graphQLClient: passClient,
                                         verificationId: verificationId,
-                                        passPhoneControl: phoneController,
+                                        passPhController: phoneController,
                                       ),
                                       type: PageTransitionType.rightToLeft));
                             },

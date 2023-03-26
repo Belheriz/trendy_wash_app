@@ -98,6 +98,7 @@ class _WashMainPageState extends State<Washmainpage> {
         site_name
         img_site
         siteId
+        tier
       }
     }
 """;
@@ -190,12 +191,15 @@ class _WashMainPageState extends State<Washmainpage> {
                     return const Text('Loading');
                   }
 
-                  List<Map<String, dynamic>>? repositories =
+                  /*List<Map<String, dynamic>>? repositories =
                       (result.data?['getSitesInfo'] as List<dynamic>)
-                          .cast<Map<String, dynamic>>();
+                          .cast<Map<String, dynamic>>();*/
 
-                  repositories
-                      .sort((a, b) => a['distances'].compareTo(b['distances']));
+                  List? repositories = result.data!['getSitesInfo'];
+                  List tier = repositories!
+                      .where((tier) => tier['getSitesInfo'] == '2')
+                      .toList();
+                  tier.sort((a, b) => a['distances'].compareTo(b['distances']));
 
                   if (repositories == null) {
                     return const Text('No repositories');
@@ -203,9 +207,9 @@ class _WashMainPageState extends State<Washmainpage> {
                   return ListView.builder(
                     scrollDirection: Axis.vertical,
                     shrinkWrap: true,
-                    itemCount: repositories.length,
+                    itemCount: tier.length,
                     itemBuilder: (BuildContext context, int index) {
-                      final laundry = repositories[index];
+                      final laundry = tier[index];
                       return ListTile(
                         trailing: Icon(Icons.star),
                         /*leading: Image.network(
