@@ -534,10 +534,10 @@ query getMachineBySite( \$siteId: ID! ){
                         if (devicesta == '0') {
                           String statusOnline = 'เครื่องว่าง';
                           deviceStatus = statusOnline;
-                        } else if (devicesta == 1) {
+                        } else if (devicesta == '1') {
                           String statusWorking = 'เครื่องทำงานอยู่';
                           deviceStatus = statusWorking;
-                        } else if (devicesta == -1) {
+                        } else if (devicesta == '-1') {
                           String statusOffline = 'ขาดการเชื่อมต่อ';
                           deviceStatus = statusOffline;
                         }

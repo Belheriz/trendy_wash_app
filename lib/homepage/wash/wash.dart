@@ -197,7 +197,7 @@ class _WashMainPageState extends State<Washmainpage> {
 
                   List? repositories = result.data!['getSitesInfo'];
                   List tier = repositories!
-                      .where((tier) => tier['getSitesInfo'] == '2')
+                      .where((tier) => tier['tier'] == '2')
                       .toList();
                   tier.sort((a, b) => a['distances'].compareTo(b['distances']));
 
