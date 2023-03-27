@@ -261,7 +261,7 @@ class _regis2PageState extends State<regis2Page> {
                                 Navigator.pushReplacement(
                                     context,
                                     PageTransition(
-                                        child: registerConfirmPasspage(
+                                        child: registerCompletepage(
                                           graphQLClient: passClient,
                                           passPhoneControl: phoneController,
                                           passwordControl: passwordController,
