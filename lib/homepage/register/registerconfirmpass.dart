@@ -106,14 +106,14 @@ class _regisConfirmPassPageState extends State<regisConfirmPassPage> {
     );
   }
 
-  Widget textshowlogin() {
+  Widget textshowregistercomplete() {
     double h = displayHeight(context);
     return Container(
       child: Column(
         children: [
           Container(
             child: Text(
-              'สมัครสมาชิก',
+              'สมัครสมาชิกเสร็จสิ้น',
               style: TextStyle(
                 fontSize: 26,
                 fontWeight: FontWeight.bold,
@@ -125,7 +125,7 @@ class _regisConfirmPassPageState extends State<regisConfirmPassPage> {
           ),
           Container(
             child: Text(
-              'กรุณาใส่รหัสผ่านของท่านอีกครั้งเพื่อยืนยัน',
+              'กรุณากดปุ่มเพื่อเข้าสู่หน้าหลัก',
               style: TextStyle(fontSize: 18),
             ),
           )
@@ -190,11 +190,7 @@ class _regisConfirmPassPageState extends State<regisConfirmPassPage> {
                 SizedBox(
                   height: h * 0.02,
                 ),
-                textshowlogin(),
-                SizedBox(
-                  height: h * 0.1,
-                ),
-                // passwordinput(),
+                textshowregistercomplete(),
                 SizedBox(
                   height: h * 0.12,
                 ),
@@ -203,35 +199,16 @@ class _regisConfirmPassPageState extends State<regisConfirmPassPage> {
                   height: h * 0.06,
                   child: ElevatedButton(
                     onPressed: (() {
-                      if (_formKey.currentState!.validate()) {
-                        if (ConfirmpasswordController.text.trim().isEmpty) {
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            SnackBar(
-                              content: Text('โปรดใส่รหัสผ่านของคุณ'),
-                              duration: Duration(seconds: 2),
-                            ),
-                          );
-                        } else if (usedPassword.text !=
-                            ConfirmpasswordController.text) {
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            SnackBar(
-                              content: Text('รหัสผ่านของคุณไม่ถูกต้อง'),
-                              duration: Duration(seconds: 2),
-                            ),
-                          );
-                        } else {
-                          Navigator.pushReplacement(
-                              context,
-                              PageTransition(
-                                  child: bottomNavbar(
-                                    graphQLClient: passClient,
-                                  ),
-                                  type: PageTransitionType.rightToLeft));
-                        }
-                      }
+                      Navigator.pushReplacement(
+                          context,
+                          PageTransition(
+                              child: bottomNavbar(
+                                graphQLClient: passClient,
+                              ),
+                              type: PageTransitionType.rightToLeft));
                     }),
                     child: Text(
-                      'ถัดไป',
+                      'หน้าหลัก',
                       style:
                           TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
                     ),
@@ -245,7 +222,6 @@ class _regisConfirmPassPageState extends State<regisConfirmPassPage> {
                 SizedBox(
                   height: 20,
                 ),
-                textandbutton(),
               ],
             ),
           ),

@@ -252,12 +252,12 @@ class _regis2PageState extends State<regis2Page> {
                                   ),
                                 );
                               } else {
-                                runMutation({
+                                /*runMutation({
                                   'tel': phoneController.text,
                                   'password': passwordController.text,
                                   'confirmPassword':
                                       ConfirmpasswordController.text,
-                                });
+                                });*/
                                 Navigator.pushReplacement(
                                     context,
                                     PageTransition(

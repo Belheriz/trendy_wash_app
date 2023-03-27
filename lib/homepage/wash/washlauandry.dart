@@ -521,10 +521,6 @@ query getMachineBySite( \$siteId: ID! ){
                         //Duration duration = Duration(seconds: seconds);
                         /* String formattedTime =
                             duration.inHours.toString() + ' hour';*/
-                        print(keeptime);
-                        print('seconds:$seconds');
-                        print(washer?['machine_group'] ?? "");
-                        print(washer?["machine_name"] ?? "");
 
                         /*if (duration.inHours > 1) {
                           formattedTime += 's';
@@ -532,7 +528,7 @@ query getMachineBySite( \$siteId: ID! ){
                         String devicesta = washer?['device_status'] ?? '';
 
                         if (devicesta == '0') {
-                          String statusOnline = 'เครื่องว่าง';
+                          String statusOnline = 'พร้อมใช้งาน';
                           deviceStatus = statusOnline;
                         } else if (devicesta == '1') {
                           String statusWorking = 'เครื่องทำงานอยู่';
@@ -1205,14 +1201,14 @@ query getMachineBySite( \$siteId: ID! ){
                               Row(
                                 children: [
                                   Text(
-                                    washer?['machine_model'] ?? '',
+                                    'เครื่องซัก ${washer?['machine_model'] ?? ''}',
                                     style: TextStyle(fontSize: 16),
                                   ),
                                   const SizedBox(
                                     width: 30,
                                   ),
                                   Text(
-                                    washer?['price_default'] ?? '',
+                                    'ราคาเริ่มต้น ${washer?['price_default'] ?? ''} บาท',
                                     style: TextStyle(fontSize: 16),
                                   ),
                                 ],
@@ -1311,12 +1307,12 @@ query getMachineBySite( \$siteId: ID! ){
                         String devicesta = dryer?['device_status'] ?? '';
 
                         if (devicesta == '0') {
-                          String statusOnline = 'เครื่องว่าง';
+                          String statusOnline = 'พร้อมใช้งาน';
                           deviceStatus = statusOnline;
-                        } else if (devicesta == 1) {
+                        } else if (devicesta == '1') {
                           String statusWorking = 'เครื่องทำงานอยู่';
                           deviceStatus = statusWorking;
-                        } else if (devicesta == -1) {
+                        } else if (devicesta == '-1') {
                           String statusOffline = 'ขาดการเชื่อมต่อ';
                           deviceStatus = statusOffline;
                         }
@@ -1358,14 +1354,14 @@ query getMachineBySite( \$siteId: ID! ){
                               Row(
                                 children: [
                                   Text(
-                                    dryer?['machine_model'] ?? '',
+                                    'เครื่องอบ ${dryer?['machine_model'] ?? ''}',
                                     style: TextStyle(fontSize: 16),
                                   ),
                                   const SizedBox(
                                     width: 30,
                                   ),
                                   Text(
-                                    dryer?['price_default'] ?? '',
+                                    'ราคาเริ่มต้น ${dryer?['price_default'] ?? ''} บาท',
                                     style: TextStyle(fontSize: 16),
                                   ),
                                 ],
