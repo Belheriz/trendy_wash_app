@@ -8,8 +8,8 @@ import 'package:trendy_mobile_1/homepage/login/loginpage.dart';
 import 'package:trendy_mobile_1/homepage/register/registerotp.dart';
 import 'package:trendy_mobile_1/homepage/size_helper.dart';
 
-class registerConfirmPasspage extends StatelessWidget {
-  const registerConfirmPasspage(
+class registerCompletepage extends StatelessWidget {
+  const registerCompletepage(
       {super.key,
       required this.graphQLClient,
       required this.passPhoneControl,
@@ -26,7 +26,7 @@ class registerConfirmPasspage extends StatelessWidget {
         primarySwatch: Colors.blue,
         fontFamily: 'LineseedsanRg',
       ),
-      home: regisConfirmPassPage(
+      home: regisCompletePage(
         title: 'Flutter Demo Home Page',
         client: graphQLClient,
         passcontrol: passPhoneControl,
@@ -36,8 +36,8 @@ class registerConfirmPasspage extends StatelessWidget {
   }
 }
 
-class regisConfirmPassPage extends StatefulWidget {
-  const regisConfirmPassPage(
+class regisCompletePage extends StatefulWidget {
+  const regisCompletePage(
       {super.key,
       required this.title,
       required this.client,
@@ -50,15 +50,15 @@ class regisConfirmPassPage extends StatefulWidget {
   final TextEditingController Password;
 
   @override
-  State<regisConfirmPassPage> createState() => _regisConfirmPassPageState(
+  State<regisCompletePage> createState() => _regisCompletePageState(
         passClient: client,
         phoneController: passcontrol,
         usedPassword: Password,
       );
 }
 
-class _regisConfirmPassPageState extends State<regisConfirmPassPage> {
-  _regisConfirmPassPageState(
+class _regisCompletePageState extends State<regisCompletePage> {
+  _regisCompletePageState(
       {required this.passClient,
       required this.phoneController,
       required this.usedPassword});

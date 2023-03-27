@@ -294,7 +294,7 @@ query getMachineBySite( \$siteId: ID! ){
     \$action_via: String!
     \$promotionId: String!
     \$mode: [String!]!
-    \$option: String!
+    \$option: [String!]!
   ) {
     startDevice(
       deviceName: \$deviceName
@@ -489,7 +489,6 @@ query getMachineBySite( \$siteId: ID! ){
               if (machines == null) {
                 return const Text('No repositories');
               }
-              print(readRepositories);
 
               return SingleChildScrollView(
                 child: Column(
@@ -1134,36 +1133,176 @@ query getMachineBySite( \$siteId: ID! ){
                                                     ],
                                                   ),
                                                 ),
-                                                Container(
-                                                  height: 50,
-                                                  width: 180,
-                                                  child: ElevatedButton(
-                                                    onPressed: () {
-                                                      Navigator.pop;
-                                                      _startDevice(
-                                                          context,
-                                                          washer?['deviceName'] ??
-                                                              "");
-                                                    },
-                                                    child: Text(
-                                                      'เริ่มซักผ้า',
-                                                      style: TextStyle(
-                                                        color: Colors.white,
-                                                        fontSize: 20,
-                                                        fontWeight:
-                                                            FontWeight.bold,
-                                                      ),
+                                                Mutation(
+                                                    options: MutationOptions(
+                                                      document: gql(
+                                                          startDeviceMutation),
+                                                      onError: (error) {
+                                                        print(error);
+                                                      },
+                                                      onCompleted:
+                                                          (dynamic Resultdata) {
+                                                        print(Resultdata);
+                                                        if (Resultdata !=
+                                                            null) {
+                                                          showDialog(
+                                                            context: context,
+                                                            builder:
+                                                                (BuildContext
+                                                                    context) {
+                                                              return AlertDialog(
+                                                                insetPadding:
+                                                                    EdgeInsets
+                                                                        .zero,
+                                                                content: Column(
+                                                                  children: [
+                                                                    Image.asset(
+                                                                        'assets/images/laundrycomplete.png'),
+                                                                    SizedBox(
+                                                                      height:
+                                                                          20,
+                                                                    ),
+                                                                    Center(
+                                                                      child:
+                                                                          Text(
+                                                                        'คำสั่งซักผ้าสำเร็จ',
+                                                                        style: TextStyle(
+                                                                            color: Colors
+                                                                                .black,
+                                                                            fontSize:
+                                                                                20,
+                                                                            fontWeight:
+                                                                                FontWeight.bold),
+                                                                      ),
+                                                                    ),
+                                                                    SizedBox(
+                                                                      height:
+                                                                          60,
+                                                                    ),
+                                                                    Container(
+                                                                      height:
+                                                                          40,
+                                                                      width:
+                                                                          180,
+                                                                      child:
+                                                                          ElevatedButton(
+                                                                        child:
+                                                                            Text(
+                                                                          'ดูการเติมเงิน',
+                                                                          style:
+                                                                              TextStyle(
+                                                                            color:
+                                                                                Colors.white,
+                                                                            fontWeight:
+                                                                                FontWeight.bold,
+                                                                          ),
+                                                                        ),
+                                                                        onPressed:
+                                                                            () {},
+                                                                        style: ElevatedButton
+                                                                            .styleFrom(
+                                                                          backgroundColor:
+                                                                              Color(0xff093B9E),
+                                                                          shape:
+                                                                              RoundedRectangleBorder(
+                                                                            borderRadius:
+                                                                                BorderRadius.all(
+                                                                              Radius.circular(14),
+                                                                            ),
+                                                                          ),
+                                                                        ),
+                                                                      ),
+                                                                    ),
+                                                                    SizedBox(
+                                                                      height:
+                                                                          15,
+                                                                    ),
+                                                                    Container(
+                                                                      height:
+                                                                          40,
+                                                                      width:
+                                                                          180,
+                                                                      child:
+                                                                          ElevatedButton(
+                                                                        child:
+                                                                            Text(
+                                                                          'กลับหน้าหลัก',
+                                                                          style: TextStyle(
+                                                                              color: Color(0xff00BBA9),
+                                                                              fontWeight: FontWeight.bold),
+                                                                        ),
+                                                                        onPressed:
+                                                                            () {},
+                                                                        style: ElevatedButton
+                                                                            .styleFrom(
+                                                                          backgroundColor:
+                                                                              Color(0xffD9F5F2),
+                                                                          shape:
+                                                                              RoundedRectangleBorder(
+                                                                            borderRadius:
+                                                                                BorderRadius.all(
+                                                                              Radius.circular(14),
+                                                                            ),
+                                                                          ),
+                                                                        ),
+                                                                      ),
+                                                                    ),
+                                                                  ],
+                                                                ),
+                                                              );
+                                                            },
+                                                          );
+                                                        }
+                                                      },
                                                     ),
-                                                    style: ElevatedButton.styleFrom(
-                                                        backgroundColor:
-                                                            Color(0xff093B9E),
-                                                        shape: RoundedRectangleBorder(
-                                                            borderRadius:
-                                                                BorderRadius.all(
-                                                                    Radius.circular(
-                                                                        14)))),
-                                                  ),
-                                                )
+                                                    builder: (RunMutation
+                                                            runMutation,
+                                                        QueryResult? result) {
+                                                      return Container(
+                                                        height: 50,
+                                                        width: 180,
+                                                        child: ElevatedButton(
+                                                          onPressed: () {
+                                                            runMutation({
+                                                              'deviceName': washer?[
+                                                                  'deviceName'],
+                                                              'customer_name':
+                                                                  "Prik",
+                                                              'customer_id':
+                                                                  "1",
+                                                              'action_price':
+                                                                  "40",
+                                                              'action_via':
+                                                                  "mobile",
+                                                              'promotionId': "",
+                                                              'mode': ["1"],
+                                                              'option': "",
+                                                            });
+                                                            Navigator.pop;
+                                                          },
+                                                          child: Text(
+                                                            'เริ่มซักผ้า',
+                                                            style: TextStyle(
+                                                              color:
+                                                                  Colors.white,
+                                                              fontSize: 20,
+                                                              fontWeight:
+                                                                  FontWeight
+                                                                      .bold,
+                                                            ),
+                                                          ),
+                                                          style: ElevatedButton.styleFrom(
+                                                              backgroundColor:
+                                                                  Color(
+                                                                      0xff093B9E),
+                                                              shape: RoundedRectangleBorder(
+                                                                  borderRadius:
+                                                                      BorderRadius.all(
+                                                                          Radius.circular(
+                                                                              14)))),
+                                                        ),
+                                                      );
+                                                    }),
                                               ],
                                             ),
                                           )
@@ -1299,8 +1438,7 @@ query getMachineBySite( \$siteId: ID! ){
                         //Duration duration = Duration(seconds: seconds);
                         /* String formattedTime =
                             duration.inHours.toString() + ' hour';*/
-                        print(keeptime);
-                        print('seconds:$seconds');
+
                         /*if (duration.inHours > 1) {
                           formattedTime += 's';
                         }*/
