@@ -213,7 +213,7 @@ class _WashMainPageState extends State<Washmainpage> {
                       return ListTile(
                         trailing: Icon(Icons.star),
                         /*leading: Image.network(
-                          laundry?['img_site'] ?? '',
+                          'https://api.graphql.trendywash.net${laundry?['img_site'] ?? ''}',
                           errorBuilder: ((context, error, stackTrace) {
                             return Text('Error Loading Image');
                           }),
