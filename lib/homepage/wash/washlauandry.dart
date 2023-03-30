@@ -4,10 +4,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:graphql_flutter/graphql_flutter.dart';
 import 'package:trendy_mobile_1/homepage/wash/wash.dart';
-import 'package:trendy_mobile_1/homepage/wash/washerModel.dart';
+
 import 'package:trendy_mobile_1/homepage/wash/washpromotion.dart';
 
-import 'dryermodel.dart';
 import 'dart:io';
 
 final HttpLink httpLink = HttpLink(

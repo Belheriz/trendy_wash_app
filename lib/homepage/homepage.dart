@@ -16,7 +16,7 @@ import 'package:trendy_mobile_1/homepage/sidemenu/stamp/stamp.dart';
 import 'package:trendy_mobile_1/main.dart';
 
 import '../locationService/location_service.dart';
-import 'wash/washModel.dart';
+
 import 'dart:io';
 
 final HttpLink httpLink = HttpLink(
@@ -94,8 +94,6 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> {
-  List<washmodel>? _laundry;
-
   String? lat1, lon1;
   String readRepositories = """
   query getSitesInfo( \$startLat: Float! \$startLon: Float! \$limit: Int!){
