@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:graphql_flutter/graphql_flutter.dart';
 import 'package:location/location.dart';
 import 'package:persistent_bottom_nav_bar_v2/persistent-tab-view.dart';
-import 'package:trendy_mobile_1/graphql/graphql_service.dart';
+
 import 'package:trendy_mobile_1/homepage/wash/washlauandry.dart';
 import 'package:trendy_mobile_1/locationService/location_service.dart';
 import 'washModel.dart';
@@ -87,7 +87,7 @@ class _WashMainPageState extends State<Washmainpage> {
   final ValueNotifier<GraphQLClient> passClient;
   bool typing = false;
   List<washmodel>? _laundry;
-  GraphQLService _graphQLService = GraphQLService();
+
   String? lat1, lon1;
   String readRepositories = """
   query getSitesInfo( \$startLat: Float! \$startLon: Float! \$limit: Int!){
@@ -120,12 +120,6 @@ class _WashMainPageState extends State<Washmainpage> {
         lon1 = locationData.longitude!.toStringAsFixed(2);
       }
     }
-  }
-
-  void _load() async {
-    _laundry = null;
-    _laundry = await _graphQLService.getLaundry(Id: '636caba997b41d387c6a2abf');
-    setState(() {});
   }
 
   @override
