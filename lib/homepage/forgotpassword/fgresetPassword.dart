@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:graphql_flutter/graphql_flutter.dart';
 import 'package:page_transition/page_transition.dart';
-import 'package:trendy_mobile_1/homepage/forgotpassword/fgconfirmPassword.dart';
+
 import 'package:trendy_mobile_1/homepage/login/loginpage2.dart';
 import 'package:trendy_mobile_1/homepage/register/register.dart';
 import 'package:trendy_mobile_1/homepage/size_helper.dart';
