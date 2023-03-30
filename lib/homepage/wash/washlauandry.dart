@@ -537,6 +537,7 @@ query getMachineBySite( \$siteId: ID! ){
                           deviceStatus = statusOffline;
                         }
                         return ListTile(
+                          leading: Image.asset('assets/images/washer1.png'),
                           onTap: () {
                             showModalBottomSheet(
                                 isScrollControlled: true,
@@ -1455,7 +1456,7 @@ query getMachineBySite( \$siteId: ID! ){
                           deviceStatus = statusOffline;
                         }
                         return ListTile(
-                          //leading: Image.asset(dryerlist.images),
+                          leading: Image.asset('assets/images/dryer1.png'),
                           title: Row(
                             children: [
                               Text(

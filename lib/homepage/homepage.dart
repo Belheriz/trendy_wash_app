@@ -13,6 +13,7 @@ import 'package:trendy_mobile_1/homepage/sidemenu/history/history.dart';
 import 'package:trendy_mobile_1/homepage/sidemenu/paymentmethod/paymentmethod.dart';
 import 'package:trendy_mobile_1/homepage/sidemenu/personalinfo/personalinfo.dart';
 import 'package:trendy_mobile_1/homepage/sidemenu/stamp/stamp.dart';
+import 'package:trendy_mobile_1/main.dart';
 
 import '../locationService/location_service.dart';
 import 'wash/washModel.dart';
@@ -233,107 +234,6 @@ class _MyHomePageState extends State<MyHomePage> {
                 ],
               ),
             ),
-            /* _laundry == null
-                ? const Center(
-                    child: CircularProgressIndicator(),
-                  )
-                : _laundry!.isEmpty
-                    ? const Center(
-                        child: Text('No data'),
-                      )
-                    : SingleChildScrollView(
-                        child: ListView.builder(
-                          scrollDirection: Axis.vertical,
-                          shrinkWrap: true,
-                          itemCount: _laundry!.length,
-                          itemBuilder: (BuildContext context, int index) {
-                            return ListTile(
-                              trailing: Icon(Icons.star),
-                              leading: Image.asset(
-                                _laundry![index].images,
-                              ),
-                              title: Text(
-                                _laundry![index].washname,
-                                style: TextStyle(
-                                  fontWeight: FontWeight.bold,
-                                  fontSize: 18,
-                                ),
-                              ),
-                              onTap: () {},
-                              subtitle: Column(
-                                mainAxisAlignment:
-                                    MainAxisAlignment.spaceBetween,
-                                children: [
-                                  Row(
-                                    children: [
-                                      Text(''),
-                                      SizedBox(
-                                        width: 20,
-                                      ),
-                                      Image.asset('assets/images/Location.png'),
-                                      Text('')
-                                    ],
-                                  ),
-                                  Row(
-                                    children: [
-                                      Container(
-                                        width: 100,
-                                        height: 30,
-                                        decoration: BoxDecoration(
-                                          color: Color(0xff093B9D),
-                                          borderRadius:
-                                              BorderRadius.circular(18),
-                                        ),
-                                        child: Align(
-                                          alignment: Alignment(0, -0.5),
-                                          child: Text(
-                                            _laundry![index].washer,
-                                            textAlign: TextAlign.center,
-                                            style: TextStyle(
-                                              color: Colors.white,
-                                              fontWeight: FontWeight.bold,
-                                            ),
-                                          ),
-                                        ),
-                                      ),
-                                      Container(
-                                        width: 100,
-                                        height: 30,
-                                        decoration: BoxDecoration(
-                                          color: Color(0xff00BBA9),
-                                          borderRadius:
-                                              BorderRadius.circular(18),
-                                        ),
-                                        child: Align(
-                                          alignment: Alignment(0, -0.5),
-                                          child: Text(
-                                            _laundry![index].dryer,
-                                            textAlign: TextAlign.center,
-                                            style: TextStyle(
-                                              color: Colors.white,
-                                              fontWeight: FontWeight.bold,
-                                            ),
-                                          ),
-                                        ),
-                                      ),
-                                    ],
-                                  ),
-                                  Align(
-                                    alignment: Alignment(-0.9, 0),
-                                    child: Text(
-                                      'ว่าง 3 เครื่อง',
-                                      style: TextStyle(
-                                        color: Colors.red,
-                                        fontWeight: FontWeight.bold,
-                                      ),
-                                    ),
-                                  )
-                                ],
-                              ),
-                            );
-                          },
-                        ),
-                      )*/
             Query(
               options: QueryOptions(
                 document: gql(readRepositories),
@@ -707,7 +607,13 @@ class NavigationDrawer extends StatelessWidget {
             width: 150,
             margin: EdgeInsets.only(left: 80),
             child: ElevatedButton(
-              onPressed: (() {}),
+              onPressed: (() {
+                pushNewScreen(
+                  context,
+                  screen: MyApp(),
+                  withNavBar: false,
+                );
+              }),
               child: Text(
                 'ออกจากระบบ',
                 style: TextStyle(
