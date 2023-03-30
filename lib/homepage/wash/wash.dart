@@ -5,7 +5,7 @@ import 'package:persistent_bottom_nav_bar_v2/persistent-tab-view.dart';
 
 import 'package:trendy_mobile_1/homepage/wash/washlauandry.dart';
 import 'package:trendy_mobile_1/locationService/location_service.dart';
-import 'washModel.dart';
+
 import 'dart:io';
 
 final HttpLink httpLink = HttpLink(
@@ -86,7 +86,6 @@ class _WashMainPageState extends State<Washmainpage> {
 
   final ValueNotifier<GraphQLClient> passClient;
   bool typing = false;
-  List<washmodel>? _laundry;
 
   String? lat1, lon1;
   String readRepositories = """

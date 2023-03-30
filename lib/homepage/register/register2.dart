@@ -4,7 +4,7 @@ import 'package:graphql_flutter/graphql_flutter.dart';
 import 'package:page_transition/page_transition.dart';
 import 'package:trendy_mobile_1/homepage/homepage.dart';
 import 'package:trendy_mobile_1/homepage/login/loginpage.dart';
-import 'package:trendy_mobile_1/homepage/register/registerconfirmpass.dart';
+import 'package:trendy_mobile_1/homepage/register/registercomplete.dart';
 import 'package:trendy_mobile_1/homepage/register/registerotp.dart';
 import 'package:trendy_mobile_1/homepage/size_helper.dart';
 
@@ -236,7 +236,15 @@ class _regis2PageState extends State<regis2Page> {
                   height: h * 0.12,
                 ),
                 Mutation(
-                    options: MutationOptions(document: gql(addUserMutation)),
+                    options: MutationOptions(
+                      document: gql(addUserMutation),
+                      onError: (error) {
+                        print(error);
+                      },
+                      onCompleted: (dynamic resultData) {
+                        print(resultData);
+                      },
+                    ),
                     builder: (RunMutation runMutation, QueryResult? result) {
                       return Container(
                         width: w * 0.8,
@@ -252,12 +260,12 @@ class _regis2PageState extends State<regis2Page> {
                                   ),
                                 );
                               } else {
-                                /*runMutation({
+                                runMutation({
                                   'tel': phoneController.text,
                                   'password': passwordController.text,
                                   'confirmPassword':
                                       ConfirmpasswordController.text,
-                                });*/
+                                });
                                 Navigator.pushReplacement(
                                     context,
                                     PageTransition(
